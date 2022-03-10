@@ -9,6 +9,14 @@ struct Point {
     y: f64,
 }
 
+impl Point {
+    fn distance(&self, another: &Point) -> f64 {
+        let x2 = (self.x - another.x).powf(2.0);
+        let y2 = (self.y - another.y).powf(2.0);
+        return (x2 + y2).sqrt() 
+    }
+}
+
 fn read_tsp(filename: &str) -> std::io::Result<()> {
     let mut file = File::open(filename)?;
     let mut contents = String::new();
@@ -58,6 +66,10 @@ fn main() -> std::io::Result<()> {
     for (key, value) in &coords {
         //println!("{}: {:?}", key, value);
     }
+
+    //let p1 = Point { x: 0.0, y: 0.0 };
+    //let p2 = Point { x: 1.0, y: 1.0 };
+    //println!("{}", p1.distance(&p2));
 
     return read_tsp("gr666.tsp");
 }
