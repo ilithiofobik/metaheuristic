@@ -1,17 +1,17 @@
 mod tsp;
-use tsp::gen;
-use tsp::geo;
 use tsp::io;
 
-fn main() -> std::io::Result<()> {
-    let coords = gen::create_tsp(100);
-    for (_key, _value) in &coords {
-        //println!("{}: {:?}", _key, _value);
+fn main() {
+    let matrix = io::read_euclid("gr666.tsp");
+    let matrix2 = io::read_full_matrix("br17.atsp");
+
+    match matrix {
+        Ok(_) => println!("Reading euclid went alright."),
+        Err(e) => println!("{}", e),
     }
 
-    let _p1 = geo::Point { x: 0.0, y: 0.0 };
-    let _p2 = geo::Point { x: 1.0, y: 1.0 };
-    //println!("{}", _p1.distance(&_p2));
-
-    return io::read_tsp("gr666.tsp");
+    match matrix2 {
+        Ok(_) => println!("Reading full matrix went alright."),
+        Err(e) => println!("{}", e),
+    }
 }
