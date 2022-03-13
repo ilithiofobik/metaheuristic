@@ -7,8 +7,9 @@ use shuffle::irs::Irs;
 use rand::rngs::mock::StepRng;
 
 fn main() {
-    let matrix = io::read_euclid("gr666.tsp");
-    let matrix2 = io::read_full_matrix("br17.atsp");
+    let matrix = io::read_file("a280.tsp");
+    let matrix2 = io::read_file("br17.atsp");
+    let matrix3 = io::read_file("a280.tsp");
 
     match matrix {
         Ok(m) => {
@@ -32,6 +33,11 @@ fn main() {
 
     match matrix2 {
         Ok(_) => println!("Reading full matrix went alright."),
+        Err(e) => println!("{}", e),
+    }
+
+    match matrix3 {
+        Ok(_) => println!("Reading lower matrix went alright."),
         Err(e) => println!("{}", e),
     }
 }

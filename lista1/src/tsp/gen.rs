@@ -9,8 +9,8 @@ pub fn create_coords(size: i32) -> std::collections::HashMap<i32, Point> {
     let mut rng = rand::thread_rng();
 
     for n in 0..size {
-        let x = rng.gen_range(-100.0..100.0);
-        let y = rng.gen_range(-100.0..100.0);
+        let x = rng.gen_range(-100..100);
+        let y = rng.gen_range(-100..100);
         let p = Point { x, y };
         coords.insert(n, p);
     }
@@ -25,11 +25,11 @@ pub fn create_atsp(size: usize) -> Matrix {
 
     for i in 0..size {
         for j in 0..i {
-            let val = rng.gen_range(-100.0..100.0);
+            let val = rng.gen_range(0..1000);
             matrix.put(i, j, val);
         }
         for j in i + 1..size {
-            let val = rng.gen_range(-100.0..100.0);
+            let val = rng.gen_range(0..1000);
             matrix.put(i, j, val);
         }
     }
@@ -44,7 +44,7 @@ pub fn create_tsp(size: usize) -> Matrix {
 
     for i in 0..size {
         for j in 0..i {
-            let val = rng.gen_range(-100.0..100.0);
+            let val = rng.gen_range(0..1000);
             matrix.put(i, j, val);
             matrix.put(j, i, val);
         }
