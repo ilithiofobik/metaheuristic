@@ -1,5 +1,5 @@
-use super::geo::Point;
 use super::geo::Matrix;
+use super::geo::Point;
 use std::collections::HashMap;
 use std::fs::File;
 use std::io::prelude::*;
@@ -17,7 +17,7 @@ pub fn read_euclid(contents: &String) -> std::io::Result<Matrix> {
     }
 
     fragment = lines.next();
-    
+
     while fragment.unwrap() != "EOF" {
         let split = fragment.unwrap().split_whitespace();
         let vec = split.collect::<Vec<&str>>();
@@ -26,10 +26,7 @@ pub fn read_euclid(contents: &String) -> std::io::Result<Matrix> {
         let x = xf as i64;
         let y = yf as i64;
 
-        coords.insert(
-            counter,
-            Point { x, y }
-        );
+        coords.insert(counter, Point { x, y });
 
         counter = counter + 1;
         fragment = lines.next();
@@ -37,16 +34,18 @@ pub fn read_euclid(contents: &String) -> std::io::Result<Matrix> {
 
     let mut matrix = Matrix::new(counter as usize);
 
-    for x in 0..counter {
-        for y in 0..counter {
-            let val = coords[&x].distance(&coords[&y]);
-            matrix.put(x, y, val);
+    for i in 0..counter {
+        let pi = &coords[&i];
+        for j in 0..i {
+            let pj = &coords[&j];
+            let val = pi.distance(&pj);
+            matrix.put(i, j, val);
+            matrix.put(j, i, val);
         }
     }
 
     return Ok(matrix);
 }
-
 
 #[allow(dead_code)]
 pub fn read_full_matrix(contents: &String) -> std::io::Result<Matrix> {
@@ -59,7 +58,12 @@ pub fn read_full_matrix(contents: &String) -> std::io::Result<Matrix> {
         fragment = lines.next();
     }
 
-    let size: usize = fragment.unwrap().trim_start_matches("DIMENSION: ").trim().parse().unwrap();
+    let size: usize = fragment
+        .unwrap()
+        .trim_start_matches("DIMENSION: ")
+        .trim()
+        .parse()
+        .unwrap();
     let mut matrix = Matrix::new(size);
 
     while fragment.unwrap() != "EDGE_WEIGHT_SECTION" {
@@ -67,7 +71,7 @@ pub fn read_full_matrix(contents: &String) -> std::io::Result<Matrix> {
     }
 
     fragment = lines.next();
-    
+
     while fragment.unwrap() != "EOF" {
         let split = fragment.unwrap().split_whitespace();
         let vec = split.collect::<Vec<&str>>();
@@ -85,7 +89,6 @@ pub fn read_full_matrix(contents: &String) -> std::io::Result<Matrix> {
     return Ok(matrix);
 }
 
-
 #[allow(dead_code)]
 pub fn read_lower_matrix(contents: &String) -> std::io::Result<Matrix> {
     let mut x = 0;
@@ -98,7 +101,12 @@ pub fn read_lower_matrix(contents: &String) -> std::io::Result<Matrix> {
         fragment = lines.next();
     }
 
-    let size: usize = fragment.unwrap().trim_start_matches("DIMENSION: ").trim().parse().unwrap();
+    let size: usize = fragment
+        .unwrap()
+        .trim_start_matches("DIMENSION: ")
+        .trim()
+        .parse()
+        .unwrap();
     let mut matrix = Matrix::new(size);
 
     while fragment.unwrap() != "EDGE_WEIGHT_SECTION" {
@@ -106,7 +114,7 @@ pub fn read_lower_matrix(contents: &String) -> std::io::Result<Matrix> {
     }
 
     fragment = lines.next();
-    
+
     while fragment.unwrap() != "EOF" {
         let split = fragment.unwrap().split_whitespace();
         let vec = split.collect::<Vec<&str>>();
@@ -131,7 +139,6 @@ pub fn read_lower_matrix(contents: &String) -> std::io::Result<Matrix> {
     return Ok(matrix);
 }
 
-
 #[allow(dead_code)]
 pub fn read_file(filename: &str) -> std::io::Result<Matrix> {
     let mut file = File::open(filename)?;
@@ -139,11 +146,11 @@ pub fn read_file(filename: &str) -> std::io::Result<Matrix> {
     file.read_to_string(&mut contents)?;
 
     if contents.contains("FULL_MATRIX") {
-        return read_full_matrix(&contents)
+        return read_full_matrix(&contents);
     } else if contents.contains("EUC_2D") {
-        return read_euclid(&contents)
+        return read_euclid(&contents);
     } else if contents.contains("LOWER_DIAG_ROW") {
-        return read_lower_matrix(&contents)
+        return read_lower_matrix(&contents);
     }
 
     panic!("Wrong format.");

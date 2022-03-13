@@ -9,7 +9,7 @@ impl Point {
     pub fn distance(&self, another: &Point) -> u64 {
         let x2 = (self.x - another.x).pow(2) as f64;
         let y2 = (self.y - another.y).pow(2) as f64;
-        return (x2 + y2).sqrt() as u64;
+        return (x2 + y2).sqrt().round() as u64;
     }
 }
 
@@ -18,7 +18,6 @@ pub struct Matrix {
     pub n: usize,
     pub matrix: Vec<u64>,
 }
-
 
 #[allow(dead_code)]
 impl Matrix {
@@ -32,6 +31,6 @@ impl Matrix {
 
     pub fn new(n: usize) -> Matrix {
         let matrix = vec![0; n * n];
-        return Matrix { n, matrix }
+        return Matrix { n, matrix };
     }
 }

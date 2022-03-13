@@ -4,7 +4,7 @@ use rand::Rng;
 use std::collections::HashMap;
 
 #[allow(dead_code)]
-pub fn create_coords(size: i32) -> std::collections::HashMap<i32, Point> {
+fn create_euclid(size: usize) -> Matrix {
     let mut coords = HashMap::new();
     let mut rng = rand::thread_rng();
 
@@ -15,7 +15,19 @@ pub fn create_coords(size: i32) -> std::collections::HashMap<i32, Point> {
         coords.insert(n, p);
     }
 
-    return coords;
+    let mut matrix = Matrix::new(size);
+
+    for i in 0..size {
+        let pi = &coords[&i];
+        for j in 0..i {
+            let pj = &coords[&j];
+            let val = pi.distance(&pj);
+            matrix.put(i, j, val);
+            matrix.put(j, i, val);
+        }
+    }
+
+    return matrix;
 }
 
 #[allow(dead_code)]

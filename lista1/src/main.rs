@@ -15,6 +15,8 @@ fn main() {
         Ok(m) => {
             println!("Reading euclid went alright.");
 
+            println!("wynik: {}", m.get(0, 1));
+
             let mut rng = StepRng::new(2, 13);
             let mut irs = Irs::default();
 
