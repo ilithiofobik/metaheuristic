@@ -64,6 +64,7 @@ pub fn read_full_matrix(contents: &String) -> std::io::Result<Matrix> {
         .trim()
         .parse()
         .unwrap();
+        
     let mut matrix = Matrix::new(size);
 
     while fragment.unwrap() != "EDGE_WEIGHT_SECTION" {
