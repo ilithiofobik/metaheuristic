@@ -40,8 +40,7 @@ fn main() {
 
     match matrix3 {
         Ok(m) => {
-            let mut best_perm = [0 as usize];
-            let best_val = alg::k_random(&m, 10, &mut best_perm);
+            let (best_val, best_perm) = alg::k_random(&m, 10);
             println!("best value is {}", best_val);
         }
         Err(e) => println!("{}", e),

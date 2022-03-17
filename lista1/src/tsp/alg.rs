@@ -14,8 +14,9 @@ pub fn objective_function(permutation: &Vec<usize>, matrix: &Matrix) -> std::io:
     return Ok(cost);
 }
 
-pub fn k_random(matrix: &Matrix, k: usize, mut best_perm: &mut [usize]) -> u64 {
+pub fn k_random(matrix: &Matrix, k: usize) -> (u64, Vec<usize>) {
     let mut vec: Vec<usize> = (0..matrix.n).collect();
+    let mut best_perm: Vec<usize> = Vec::new();
     let mut best_value = u64::MAX;
 
     for _ in 0..k {
@@ -32,12 +33,16 @@ pub fn k_random(matrix: &Matrix, k: usize, mut best_perm: &mut [usize]) -> u64 {
             Ok(m) => {
                 if best_value > m {
                     best_value = m;
-                    *best_perm = *slice;
+                    best_perm = Vec::new();
+                    for x in slice {
+                        best_perm.push(*x);
+                    }
+                    //*best_perm = *slice;
                 }
             }
             Err(e) => println!("{}", e),
         }
     }
 
-    return best_value;
+    return (best_value, best_perm);
 }
