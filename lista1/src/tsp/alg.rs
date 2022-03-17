@@ -5,9 +5,10 @@ use rand::seq::SliceRandom;
 use rand::{thread_rng, Rng};
 
 pub fn objective_function(permutation: &Vec<usize>, matrix: &Matrix) -> std::io::Result<u64> {
-    let mut cost = 0;
+    let n = matrix.n;
+    let mut cost = matrix.get(permutation[n - 1], permutation[0]);
 
-    for i in 1..matrix.n - 1 {
+    for i in 1..n  {
         cost = cost + matrix.get(permutation[i - 1], permutation[i]);
     }
 
@@ -37,7 +38,6 @@ pub fn k_random(matrix: &Matrix, k: usize) -> (u64, Vec<usize>) {
                     for x in slice {
                         best_perm.push(*x);
                     }
-                    //*best_perm = *slice;
                 }
             }
             Err(e) => println!("{}", e),

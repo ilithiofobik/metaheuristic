@@ -20,7 +20,7 @@ fn main() {
             let mut rng = StepRng::new(2, 13);
             let mut irs = Irs::default();
 
-            let mut input: Vec<usize> = (1..m.n).map(|x| x).collect();
+            let mut input: Vec<usize> = (0..m.n).map(|x| x).collect();
             irs.shuffle(&mut input, &mut rng);
 
             let cost = alg::objective_function(&input, &m);
@@ -42,6 +42,8 @@ fn main() {
         Ok(m) => {
             let (best_val, best_perm) = alg::k_random(&m, 10);
             println!("best value is {}", best_val);
+            println!("best perm is {:?}", best_perm);
+
         }
         Err(e) => println!("{}", e),
     }
