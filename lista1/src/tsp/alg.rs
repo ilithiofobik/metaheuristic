@@ -3,7 +3,7 @@ extern crate rand;
 use super::geo::Matrix;
 use rand::seq::SliceRandom;
 
-pub fn objective_function(permutation: &Vec<usize>, matrix: &Matrix) -> u64 {
+fn objective_function(permutation: &Vec<usize>, matrix: &Matrix) -> u64 {
     let n = matrix.n;
     let mut cost = matrix.get(permutation[n - 1], permutation[0]);
 
