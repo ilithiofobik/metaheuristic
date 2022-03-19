@@ -24,11 +24,7 @@ fn main() {
             irs.shuffle(&mut input, &mut rng);
 
             let cost = alg::objective_function(&input, &m);
-
-            match cost {
-                Ok(c) => println!("{}", c),
-                Err(e) => println!("{}", e),
-            }
+            println!("{}", cost);
         }
         Err(e) => println!("{}", e),
     }
@@ -40,10 +36,9 @@ fn main() {
 
     match matrix3 {
         Ok(m) => {
-            let (best_val, best_perm) = alg::k_random(&m, 10);
+            let (best_val, best_perm) = alg::two_opt(&m);
             println!("best value is {}", best_val);
             println!("best perm is {:?}", best_perm);
-
         }
         Err(e) => println!("{}", e),
     }
