@@ -40,14 +40,29 @@ pub fn k_random(matrix: &Matrix, k: usize) -> (u64, Vec<usize>) {
     return (best_value, best_perm);
 }
 
-pub fn closest_neighbor(matrix: &Matrix) -> (u64, Vec<usize>) {
+pub fn nearest_neighbor(matrix: &Matrix) -> (u64, Vec<usize>) {
     let mut rng = rand::thread_rng();
-    let range = rng.gen_range(0..matrix.n);
+    let start_vertex = rng.gen_range(0..matrix.n);
 
-    return closest_neighbor_count(matrix, range)
+    return nearest_neighbor_count(matrix, start_vertex)
 }
 
-fn closest_neighbor_count(matrix: &Matrix, mut current_vertex: usize) -> (u64, Vec<usize>) { 
+pub fn extended_nearest_neighbor(matrix: &Matrix) -> (u64, Vec<usize>) {
+    let mut best_perm: Vec<usize> = Vec::new();
+    let mut best_value: u64 = std::u64::MAX;
+    
+    for start_vertex in 0..matrix.n {
+        let (value, perm) = nearest_neighbor_count(matrix, start_vertex);
+        if value < best_value {
+            best_value = value;
+            best_perm = perm;
+        }
+    }
+
+    return (best_value, best_perm)
+}
+
+fn nearest_neighbor_count(matrix: &Matrix, mut current_vertex: usize) -> (u64, Vec<usize>) { 
     let mut unvisited: Vec<usize> = (0..matrix.n).collect();
 
     let mut final_perm: Vec<usize> = Vec::new();
