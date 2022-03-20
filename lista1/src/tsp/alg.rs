@@ -2,6 +2,7 @@ extern crate rand;
 
 use super::geo::Matrix;
 use rand::seq::SliceRandom;
+use rand::Rng;
 
 fn objective_function(permutation: &Vec<usize>, matrix: &Matrix) -> u64 {
     let n = matrix.n;
@@ -37,6 +38,43 @@ pub fn k_random(matrix: &Matrix, k: usize) -> (u64, Vec<usize>) {
     }
 
     return (best_value, best_perm);
+}
+
+pub fn closest_neighbor(matrix: &Matrix) -> (u64, Vec<usize>) {
+    let mut rng = rand::thread_rng();
+    let range = rng.gen_range(0..matrix.n);
+
+    return closest_neighbor_count(matrix, range)
+}
+
+fn closest_neighbor_count(matrix: &Matrix, mut current_vertex: usize) -> (u64, Vec<usize>) { 
+    let mut unvisited: Vec<usize> = (0..matrix.n).collect();
+
+    let mut final_perm: Vec<usize> = Vec::new();
+    let mut final_value: u64 = 0;
+
+    final_perm.push(current_vertex as usize);
+
+    while !unvisited.is_empty() {
+        let mut closest_town = matrix.n;
+        let mut best_value = std::u64::MAX;
+
+        for town in unvisited.iter() {
+            if current_vertex != *town && matrix.get(current_vertex, *town) < best_value {
+                best_value = matrix.get(current_vertex, *town);
+                closest_town = *town;
+            }
+        }
+        
+        current_vertex = closest_town;
+        final_value = final_value + best_value;
+        final_perm.push(current_vertex as usize);
+
+        let index = unvisited.iter().position(|x| *x == current_vertex).unwrap();
+        unvisited.remove(index);
+    }
+
+    return (final_value, final_perm);
 }
 
 fn reverse(perm: &mut Vec<usize>, x: usize, y: usize) {
