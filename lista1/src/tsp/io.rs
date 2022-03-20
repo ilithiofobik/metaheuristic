@@ -6,11 +6,25 @@ use std::io::prelude::*;
 
 #[allow(dead_code)]
 pub fn read_euclid(contents: &String) -> std::io::Result<Matrix> {
-    let mut coords = HashMap::new();
     let mut counter = 0;
 
     let mut lines = contents.lines();
     let mut fragment = lines.next();
+
+    while !fragment.unwrap().starts_with("DIMENSION") {
+        fragment = lines.next();
+    }
+
+    let size: usize = fragment
+        .unwrap()
+        .trim_start_matches("DIMENSION")
+        .trim()
+        .trim_start_matches(":")
+        .trim()
+        .parse()
+        .unwrap();
+    let mut matrix = Matrix::new(size);
+    let mut coords = HashMap::new();
 
     while fragment.unwrap() != "NODE_COORD_SECTION" {
         fragment = lines.next();
@@ -18,7 +32,7 @@ pub fn read_euclid(contents: &String) -> std::io::Result<Matrix> {
 
     fragment = lines.next();
 
-    while fragment.unwrap() != "EOF" {
+    while counter < size {
         let split = fragment.unwrap().split_whitespace();
         let vec = split.collect::<Vec<&str>>();
         let xf: f64 = vec[1].parse().unwrap();
@@ -31,8 +45,6 @@ pub fn read_euclid(contents: &String) -> std::io::Result<Matrix> {
         counter = counter + 1;
         fragment = lines.next();
     }
-
-    let mut matrix = Matrix::new(counter as usize);
 
     for i in 0..counter {
         let pi = &coords[&i];
@@ -54,17 +66,18 @@ pub fn read_full_matrix(contents: &String) -> std::io::Result<Matrix> {
     let mut lines = contents.lines();
     let mut fragment = lines.next();
 
-    while !fragment.unwrap().starts_with("DIMENSION:") {
+    while !fragment.unwrap().starts_with("DIMENSION") {
         fragment = lines.next();
     }
 
     let size: usize = fragment
         .unwrap()
-        .trim_start_matches("DIMENSION: ")
+        .trim_start_matches("DIMENSION")
+        .trim()
+        .trim_start_matches(":")
         .trim()
         .parse()
         .unwrap();
-        
     let mut matrix = Matrix::new(size);
 
     while fragment.unwrap() != "EDGE_WEIGHT_SECTION" {
@@ -73,7 +86,7 @@ pub fn read_full_matrix(contents: &String) -> std::io::Result<Matrix> {
 
     fragment = lines.next();
 
-    while fragment.unwrap() != "EOF" {
+    while counter < size * size {
         let split = fragment.unwrap().split_whitespace();
         let vec = split.collect::<Vec<&str>>();
 
@@ -98,13 +111,15 @@ pub fn read_lower_matrix(contents: &String) -> std::io::Result<Matrix> {
     let mut lines = contents.lines();
     let mut fragment = lines.next();
 
-    while !fragment.unwrap().starts_with("DIMENSION:") {
+    while !fragment.unwrap().starts_with("DIMENSION") {
         fragment = lines.next();
     }
 
     let size: usize = fragment
         .unwrap()
-        .trim_start_matches("DIMENSION: ")
+        .trim_start_matches("DIMENSION")
+        .trim()
+        .trim_start_matches(":")
         .trim()
         .parse()
         .unwrap();
@@ -116,7 +131,7 @@ pub fn read_lower_matrix(contents: &String) -> std::io::Result<Matrix> {
 
     fragment = lines.next();
 
-    while fragment.unwrap() != "EOF" {
+    while x < size {
         let split = fragment.unwrap().split_whitespace();
         let vec = split.collect::<Vec<&str>>();
 

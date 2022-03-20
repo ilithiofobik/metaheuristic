@@ -44,13 +44,13 @@ pub fn nearest_neighbor(matrix: &Matrix) -> (u64, Vec<usize>) {
     let mut rng = rand::thread_rng();
     let start_vertex = rng.gen_range(0..matrix.n);
 
-    return nearest_neighbor_count(matrix, start_vertex)
+    return nearest_neighbor_count(matrix, start_vertex);
 }
 
 pub fn extended_nearest_neighbor(matrix: &Matrix) -> (u64, Vec<usize>) {
     let mut best_perm: Vec<usize> = Vec::new();
     let mut best_value: u64 = std::u64::MAX;
-    
+
     for start_vertex in 0..matrix.n {
         let (value, perm) = nearest_neighbor_count(matrix, start_vertex);
         if value < best_value {
@@ -59,15 +59,18 @@ pub fn extended_nearest_neighbor(matrix: &Matrix) -> (u64, Vec<usize>) {
         }
     }
 
-    return (best_value, best_perm)
+    return (best_value, best_perm);
 }
 
-fn nearest_neighbor_count(matrix: &Matrix, mut current_vertex: usize) -> (u64, Vec<usize>) { 
+fn nearest_neighbor_count(matrix: &Matrix, first_vertex: usize) -> (u64, Vec<usize>) {
+    let mut current_vertex = first_vertex;
     let mut unvisited: Vec<usize> = (0..matrix.n).collect();
 
     let mut final_perm: Vec<usize> = Vec::new();
     let mut final_value: u64 = 0;
 
+    let index = unvisited.iter().position(|x| *x == current_vertex).unwrap();
+    unvisited.remove(index);
     final_perm.push(current_vertex as usize);
 
     while !unvisited.is_empty() {
@@ -75,12 +78,12 @@ fn nearest_neighbor_count(matrix: &Matrix, mut current_vertex: usize) -> (u64, V
         let mut best_value = std::u64::MAX;
 
         for town in unvisited.iter() {
-            if current_vertex != *town && matrix.get(current_vertex, *town) < best_value {
+            if matrix.get(current_vertex, *town) < best_value {
                 best_value = matrix.get(current_vertex, *town);
                 closest_town = *town;
             }
         }
-        
+
         current_vertex = closest_town;
         final_value = final_value + best_value;
         final_perm.push(current_vertex as usize);
@@ -88,6 +91,8 @@ fn nearest_neighbor_count(matrix: &Matrix, mut current_vertex: usize) -> (u64, V
         let index = unvisited.iter().position(|x| *x == current_vertex).unwrap();
         unvisited.remove(index);
     }
+
+    final_value = final_value + matrix.get(current_vertex, first_vertex);
 
     return (final_value, final_perm);
 }
@@ -107,7 +112,7 @@ fn reverse(perm: &mut Vec<usize>, x: usize, y: usize) {
 }
 
 pub fn two_opt(matrix: &Matrix) -> (u64, Vec<usize>) {
-    let (mut best_value, mut best_perm) = k_random(&matrix, matrix.n);
+    let (mut best_value, mut best_perm) = extended_nearest_neighbor(&matrix);
     let mut found_better = true;
     let mut best_i = 0;
     let mut best_j = 0;
