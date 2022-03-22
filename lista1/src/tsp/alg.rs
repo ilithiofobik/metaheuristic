@@ -111,29 +111,63 @@ fn reverse(perm: &mut Vec<usize>, x: usize, y: usize) {
     }
 }
 
+fn change_value(perm: &Vec<usize>, matrix: &Matrix, first: usize, last: usize) -> u64 {
+    let n = matrix.n;
+
+    let prev = (first + n - 1) % n;
+    let succ = (last + 1) % n;
+
+    let mut old_val = {
+        if succ != first {
+            matrix.get(perm[prev], perm[first]) + matrix.get(perm[last], perm[succ])
+        } else {
+            matrix.get(perm[last], perm[first])
+        }
+    };
+
+    let mut new_val = {
+        if succ != first {
+            matrix.get(perm[prev], perm[last]) + matrix.get(perm[first], perm[succ])
+        } else {
+            matrix.get(perm[first], perm[last])
+        }
+    };
+
+    for i in first..last {
+        old_val = old_val + matrix.get(perm[i], perm[i + 1]);
+        new_val = new_val + matrix.get(perm[i + 1], perm[i]);
+    }
+
+    if new_val < old_val {
+        return old_val - new_val;
+    }
+    return 0;
+}
+
 pub fn two_opt(matrix: &Matrix) -> (u64, Vec<usize>) {
     let (mut best_value, mut best_perm) = extended_nearest_neighbor(&matrix);
     let mut found_better = true;
+    let mut best_change;
     let mut best_i = 0;
     let mut best_j = 0;
 
     while found_better {
         found_better = false;
+        best_change = 0;
         for i in 0..matrix.n - 1 {
             for j in i + 1..matrix.n {
-                reverse(&mut best_perm, i, j);
-                let new_value = objective_function(&best_perm, &matrix);
-                if new_value < best_value {
+                let new_change = change_value(&best_perm, &matrix, i, j);
+                if new_change > best_change {
                     found_better = true;
                     best_i = i;
                     best_j = j;
-                    best_value = new_value;
+                    best_change = new_change;
                 }
-                reverse(&mut best_perm, i, j);
             }
         }
         if found_better {
             reverse(&mut best_perm, best_i, best_j);
+            best_value = best_value - best_change;
         }
     }
 
