@@ -111,7 +111,14 @@ fn reverse(perm: &mut Vec<usize>, x: usize, y: usize) {
     }
 }
 
-fn change_value(perm: &Vec<usize>, matrix: &Matrix, first: usize, last: usize) -> u64 {
+fn change_value(
+    perm: &Vec<usize>,
+    matrix: &Matrix,
+    first: usize,
+    last: usize,
+    old_sums: &Vec<u64>,
+    new_sums: &Vec<u64>,
+) -> u64 {
     let n = matrix.n;
 
     let prev = (first + n - 1) % n;
@@ -133,10 +140,8 @@ fn change_value(perm: &Vec<usize>, matrix: &Matrix, first: usize, last: usize) -
         }
     };
 
-    for i in first..last {
-        old_val = old_val + matrix.get(perm[i], perm[i + 1]);
-        new_val = new_val + matrix.get(perm[i + 1], perm[i]);
-    }
+    old_val = old_val + old_sums[last] - old_sums[first];
+    new_val = new_val + new_sums[first] - new_sums[last];
 
     if new_val < old_val {
         return old_val - new_val;
@@ -146,17 +151,35 @@ fn change_value(perm: &Vec<usize>, matrix: &Matrix, first: usize, last: usize) -
 
 pub fn two_opt(matrix: &Matrix) -> (u64, Vec<usize>) {
     let (mut best_value, mut best_perm) = extended_nearest_neighbor(&matrix);
+    let n = matrix.n;
     let mut found_better = true;
     let mut best_change;
     let mut best_i = 0;
     let mut best_j = 0;
 
+    let mut old_sums: Vec<u64> = vec![0; n];
+    let mut new_sums: Vec<u64> = vec![0; n];
+
     while found_better {
         found_better = false;
         best_change = 0;
+
+        old_sums[0] = 0;
+        new_sums[n - 1] = 0;
+
+        // keeping sums of weights from 0 to i in order to calculate cost of path in constant time
+        for i in 0..n - 1 {
+            old_sums[i + 1] = old_sums[i] + matrix.get(best_perm[i], best_perm[i + 1]);
+        }
+
+        // keeping sums of weights from n-1 to i in order to calculate cost of reversed path in constant time
+        for i in (0..n - 1).rev() {
+            new_sums[i] = new_sums[i + 1] + matrix.get(best_perm[i + 1], best_perm[i]);
+        }
+
         for i in 0..matrix.n - 1 {
             for j in i + 1..matrix.n {
-                let new_change = change_value(&best_perm, &matrix, i, j);
+                let new_change = change_value(&best_perm, &matrix, i, j, &old_sums, &new_sums);
                 if new_change > best_change {
                     found_better = true;
                     best_i = i;

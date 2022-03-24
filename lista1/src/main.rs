@@ -4,7 +4,7 @@ use tsp::alg;
 use tsp::io;
 
 fn main() {
-    let matrix = io::read_file("data/euc_2d/pr1002.tsp");
+    let matrix = io::read_file("data/full_matrix/ftv33.atsp");
 
     match matrix {
         // using ref if another match matrix is needed
