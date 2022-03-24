@@ -4,7 +4,7 @@ use rand::Rng;
 use std::collections::HashMap;
 
 #[allow(dead_code)]
-fn create_euclid(size: usize) -> Matrix {
+pub fn create_euclid(size: usize) -> Matrix {
     let mut coords = HashMap::new();
     let mut rng = rand::thread_rng();
 
