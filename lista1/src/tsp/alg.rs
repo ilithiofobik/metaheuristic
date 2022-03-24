@@ -164,9 +164,6 @@ pub fn two_opt(matrix: &Matrix) -> (u64, Vec<usize>) {
         found_better = false;
         best_change = 0;
 
-        old_sums[0] = 0;
-        new_sums[n - 1] = 0;
-
         // keeping sums of weights from 0 to i in order to calculate cost of path in constant time
         for i in 0..n - 1 {
             old_sums[i + 1] = old_sums[i] + matrix.get(best_perm[i], best_perm[i + 1]);
