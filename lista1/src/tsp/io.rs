@@ -171,3 +171,43 @@ pub fn read_file(filename: &str) -> std::io::Result<Matrix> {
 
     panic!("Wrong format.");
 }
+
+pub fn read_tour(filename: &str) -> std::io::Result<Vec<usize>> {
+    let mut file = File::open(filename)?;
+    let mut contents = String::new();
+    file.read_to_string(&mut contents)?;
+
+    let mut perm = Vec::new();
+
+    let mut lines = contents.lines();
+    let mut fragment = lines.next();
+
+    while fragment.unwrap() != "TOUR_SECTION" {
+        fragment = lines.next();
+    }
+
+    fragment = lines.next();
+
+    let mut minus_one = false;
+
+    while !minus_one {
+        let split = fragment.unwrap().split_whitespace();
+        let vec = split.collect::<Vec<&str>>();
+
+        for word in vec {
+            let fval: f64 = word.parse().unwrap();
+            let val = fval as i64;
+
+            if val == -1 {
+                minus_one = true;
+                break;
+            }
+
+            perm.push((val - 1) as usize);
+        }
+
+        fragment = lines.next();
+    }
+
+    return Ok(perm);
+}

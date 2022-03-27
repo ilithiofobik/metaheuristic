@@ -4,7 +4,7 @@ use super::geo::Matrix;
 use rand::seq::SliceRandom;
 use rand::Rng;
 
-fn objective_function(permutation: &Vec<usize>, matrix: &Matrix) -> u64 {
+pub fn objective_function(permutation: &Vec<usize>, matrix: &Matrix) -> u64 {
     let n = matrix.n;
     let mut cost = matrix.get(permutation[n - 1], permutation[0]);
 

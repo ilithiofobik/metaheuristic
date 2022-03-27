@@ -1,9 +1,131 @@
 use super::alg;
 use super::gen;
 use super::geo::Matrix;
-use std::cmp::min;
+use super::io;
+use std::cmp::{max, min};
 use std::fs;
 use std::time::Instant;
+
+fn tour_name(filename: &str) -> String {
+    let pre = "data/euc_2d/";
+    let post = ".opt.tour";
+    let tour = pre.to_owned() + &filename;
+    let tour2 = tour + &post;
+
+    return tour2;
+}
+
+fn tsp_name(filename: &str) -> String {
+    let pre = "data/euc_2d/";
+    let post = ".tsp";
+    let tour = pre.to_owned() + &filename;
+    let tour2 = tour + &post;
+
+    return tour2;
+}
+
+pub fn test_tsplib() {
+    let files = [
+        "a280", "berlin52", "ch130", "ch150", "eil51", "eil76", "lin105", "pcb442", "pr76",
+        "rd100", "st70", "tsp225",
+    ]; //pr1002
+
+    let mut result_all = String::new();
+    let mut result_prd = String::new();
+    let mut result_avg_time = String::new();
+    let mut result_max_time = String::new();
+
+    for file in files {
+        let tour_name = tour_name(&file);
+        let best_perm = io::read_tour(&tour_name);
+
+        match best_perm {
+            Ok(bst_p) => {
+                let tsp_name = tsp_name(&file);
+                let matrix = io::read_file(&tsp_name);
+
+                match matrix {
+                    Ok(m) => {
+                        let best_val = alg::objective_function(&bst_p, &m) as f64;
+                        let mut avg_prd_k_rand = 0;
+                        let mut avg_time_k_rand = 0;
+                        let mut max_time_k_rand = 0;
+                        let mut avg_prd_ext_neigh = 0;
+                        let mut avg_time_ext_neig = 0;
+                        let mut max_time_ext_neig = 0;
+                        let mut avg_prd_2_opt = 0;
+                        let mut avg_time_2_opt = 0;
+                        let mut max_time_2_opt = 0;
+
+                        for _ in 0..10 {
+                            let start = Instant::now();
+                            let (val, _) = alg::k_random(&m, 1000);
+                            let duration = start.elapsed().as_nanos();
+                            avg_prd_k_rand = avg_prd_k_rand + val;
+                            avg_time_k_rand = avg_time_k_rand + duration;
+                            max_time_k_rand = max(max_time_k_rand, duration);
+
+                            let start = Instant::now();
+                            let (val, _) = alg::extended_nearest_neighbor(&m);
+                            let duration = start.elapsed().as_nanos();
+                            avg_prd_ext_neigh = avg_prd_ext_neigh + val;
+                            avg_time_ext_neig = avg_time_ext_neig + duration;
+                            max_time_ext_neig = max(max_time_ext_neig, duration);
+
+                            let start = Instant::now();
+                            let (val, _) = alg::two_opt(&m);
+                            let duration = start.elapsed().as_nanos();
+                            avg_prd_2_opt = avg_prd_2_opt + val;
+                            avg_time_2_opt = avg_time_2_opt + duration;
+                            max_time_2_opt = max(max_time_2_opt, duration);
+                        }
+
+                        let favg_prd_k_rand = 10.0 * (avg_prd_k_rand as f64 - best_val) / best_val;
+                        let favg_prd_ext_neigh =
+                            10.0 * (avg_prd_ext_neigh as f64 - best_val) / best_val;
+                        let favg_prd_2_opt = 10.0 * (avg_prd_2_opt as f64 - best_val) / best_val;
+
+                        let result = format!(
+                            "{};{:.3};{:.3};{:.3};{};{};{};{};{};{}\n",
+                            m.n,
+                            favg_prd_k_rand,
+                            favg_prd_ext_neigh,
+                            favg_prd_2_opt,
+                            avg_time_k_rand,
+                            avg_time_ext_neig,
+                            avg_time_2_opt,
+                            max_time_k_rand,
+                            max_time_ext_neig,
+                            max_time_2_opt
+                        );
+                        result_all.push_str(&result);
+                        let result = format!(
+                            "{};{:.3};{:.3};{:.3}\n",
+                            m.n, favg_prd_k_rand, favg_prd_ext_neigh, favg_prd_2_opt
+                        );
+                        result_prd.push_str(&result);
+                        let result = format!(
+                            "{};{};{};{}\n",
+                            m.n, avg_time_k_rand, avg_time_ext_neig, avg_time_2_opt,
+                        );
+                        result_avg_time.push_str(&result);
+                        let result = format!(
+                            "{};{};{};{}\n",
+                            m.n, max_time_k_rand, max_time_ext_neig, max_time_2_opt
+                        );
+                        result_max_time.push_str(&result);
+                    }
+                    Err(_) => panic!("Some error with {}", tsp_name),
+                }
+            }
+            Err(_) => panic!("Some error with {}", tour_name),
+        }
+    }
+    fs::write("results/tsp_lib_test.txt", result_all).expect("Unable to write file");
+    fs::write("results/tsp_lib_test_prd.txt", result_prd).expect("Unable to write file");
+    fs::write("results/tsp_lib_test_avg_time.txt", result_avg_time).expect("Unable to write file");
+    fs::write("results/tsp_lib_test_max_time.txt", result_max_time).expect("Unable to write file");
+}
 
 pub fn test_k_random(gen: fn(usize) -> Matrix, filename: &str) {
     let mut result_prd = String::new();
