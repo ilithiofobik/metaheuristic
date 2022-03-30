@@ -222,5 +222,378 @@
 \end{center}
 
 
+\section{Porównanie algorytmów na grafach generowanych losowo}
+\subsection{Tabele}
+
+\subsubsection{Grafy asymetryczne}
+
+\begin{center}
+\begin{tabular}{|c|c|c|c|c|}
+\hline
+\multicolumn{5}{|c|}{\textbf{Average Time}}\\
+\hline
+\textbf{n} & 1000-Random & Neighbours & Extended-Neighbours & 2-OPT\\
+\hline
+100 & 5215583333 & 28571666 & 2786506666 & 3001888333\\
+\hline
+200 & 10385900000 & 102848333 & 20872141666 & 21460786666\\
+\hline
+300 & 15575736666 & 230665000 & 69467785000 & 71687228333\\
+\hline
+400 & 20725138333 & 400460000 & 161340206666 & 164356600000\\
+\hline
+500 & 25681436666 & 630796666 & 312382090000 & 319592263333\\
+\hline
+600 & 31847411666 & 893138333 & 539254811666 & 546289266666\\
+\hline
+700 & 37347566666 & 1216818333 & 852635371666 & 864857386666\\
+\hline
+800 & 43085846666 & 1589101666 & 1276754056666 & 1285017576666\\
+\hline
+900 & 48517803333 & 2017996666 & 1807960408333 & 1825393600000\\
+\hline
+1000 & 53376455000 & 2458155000 & 2488077001666 & 2527648053333\\
+\hline
+\end{tabular}
+\end{center}
+
+\begin{center}
+\begin{tabular}{|c|c|c|c|c|}
+\hline
+\multicolumn{5}{|c|}{\textbf{Maximum Time}}\\
+\hline
+\textbf{n} & 1000-Random & Neighbours & Extended-Neighbours & 2-OPT\\
+\hline
+100 & 53740500 & 296200 & 28250900 & 31605000\\
+\hline
+200 & 110770900 & 1068300 & 222382100 & 217436400\\
+\hline
+300 & 156366900 & 2430200 & 699352300 & 730365300\\
+\hline
+400 & 218396100 & 4173300 & 1630130200 & 1658699700\\
+\hline
+500 & 272075700 & 6445900 & 3154009300 & 3248476300\\
+\hline
+600 & 326146900 & 9109900 & 5445648700 & 5518205200\\
+\hline
+700 & 392337400 & 12303600 & 8644185800 & 8705532900\\
+\hline
+800 & 442730100 & 16022200 & 12919136400 & 12989845300\\
+\hline
+900 & 497044800 & 20912700 & 18259475600 & 18320587400\\
+\hline
+1000 & 545819300 & 25097700 & 25367610900 & 26443099700\\
+\hline
+\end{tabular}
+\end{center}
+
+\begin{center}
+\begin{tabular}{|c|c|c|c|c|}
+\hline
+\multicolumn{5}{|c|}{\textbf{Average PRD}}\\
+\hline
+\textbf{n} & 1000-Random & Neighbours & Extended-Neighbours & 2-OPT\\
+\hline
+100 & 144389.48040576265 & 5323.792664503988 & 19.841269841269842 & 0\\
+\hline
+200 & 264424.58297728904 & 5207.564744303786 & 0 & 0\\
+\hline
+300 & 344372.7648431962 & 5095.76765521116 & 99.36766034327009 & 0\\
+\hline
+400 & 454295.2612852427 & 5024.999051480909 & 0 & 0\\
+\hline
+500 & 542028.8049036451 & 3589.213599432774 & 103.10202617894926 & 0\\
+\hline
+600 & 699247.4253613068 & 4932.616806843915 & 0 & 0\\
+\hline
+700 & 755741.8205443585 & 4089.52732594919 & 0 & 0\\
+\hline
+800 & 808528.5198217536 & 4024.938451458384 & 0 & 0\\
+\hline
+900 & 926564.7954870298 & 4759.48286220438 & 0 & 0\\
+\hline
+1000 & 1000638.9406083454 & 3671.7679495233406 & 0 & 0\\
+\hline
+\end{tabular}
+\end{center}
+
+
+\subsubsection{Grafy symetryczne}
+
+\begin{center}
+\begin{tabular}{|c|c|c|c|c|}
+\hline
+\multicolumn{5}{|c|}{\textbf{Average Time}}\\
+\hline
+\textbf{n} & 1000-Random & Neighbours & Extended-Neighbours & 2-OPT\\
+\hline
+100 & 5118872000 & 27634000 & 2761260000 & 4705872000\\
+\hline
+200 & 10426454000 & 110419000 & 20948980000 & 33434436000\\
+\hline
+300 & 15504584000 & 235028000 & 69605889000 & 109212242000\\
+\hline
+400 & 20687462000 & 405624000 & 162160400000 & 246114934000\\
+\hline
+500 & 25238599000 & 626720000 & 315572915000 & 464210183000\\
+\hline
+600 & 33565792000 & 908487000 & 552476749000 & 793604803000\\
+\hline
+700 & 40401877000 & 1304289000 & 891778583000 & 1298559476000\\
+\hline
+800 & 44722603000 & 1664659000 & 1291840090000 & 1848839045000\\
+\hline
+900 & 48923905000 & 2028359000 & 1834605650000 & 2642838875000\\
+\hline
+1000 & 53613716000 & 2543461000 & 2531951057000 & 3497862690000\\
+\hline
+\end{tabular}
+\end{center}
+
+
+\begin{center}
+\begin{tabular}{|c|c|c|c|c|}
+\hline
+\multicolumn{5}{|c|}{\textbf{Maximum Time}}\\
+\hline
+100 & 53478300 & 287700 & 28774700 & 59023500\\
+\hline
+200 & 118932100 & 1496800 & 225860300 & 374150100\\
+\hline
+300 & 158825400 & 2666500 & 713698900 & 1210248700\\
+\hline
+400 & 214809200 & 4154100 & 1651365900 & 2783661100\\
+\hline
+500 & 259651300 & 6437400 & 3196615100 & 4989667500\\
+\hline
+600 & 369051000 & 9376100 & 5731537000 & 8662696500\\
+\hline
+700 & 453044000 & 15011700 & 9255213200 & 14112162500\\
+\hline
+800 & 519034200 & 18486000 & 13176742300 & 20361935900\\
+\hline
+900 & 542197200 & 21026000 & 18626545300 & 27632920000\\
+\hline
+1000 & 587381000 & 28130500 & 26359530800 & 38144374100\\
+\hline
+\end{tabular}
+\end{center}
+
+\begin{center}
+\begin{tabular}{|c|c|c|c|c|}
+\hline
+\multicolumn{5}{|c|}{\textbf{Average PRD}}\\
+\hline
+\textbf{n} & 1000-Random & Neighbours & Extended-Neighbours & 2-OPT\\
+\hline
+100 & 169641.5152490044 & 8651.420983070748 & 2910.828178233857 & 0\\
+\hline
+200 & 336491.148021938 & 8695.594682621479 & 3759.5914230406697 & 0\\
+\hline
+300 & 467506.6707100455 & 9672.03524228703 & 3958.851600018442 & 0\\
+\hline
+400 & 626451.037540901 & 9242.735074436148 & 4352.368040212525 & 0\\
+\hline
+500 & 762030.9959416362 & 9491.651021903159 & 3688.834144036091 & 0\\
+\hline
+600 & 907750.4576801556 & 10564.279122298864 & 3896.5508009869172 & 0\\
+\hline
+700 & 999294.050859801 & 10511.632970306257 & 4405.698984443974 & 0\\
+\hline
+800 & 1177366.205236822 & 10932.69827564215 & 4323.395735797874 & 0\\
+\hline
+900 & 1312890.7423081866 & 9844.799687300712 & 4385.352415182208 & 0\\
+\hline
+1000 & 1445342.3876189813 & 9645.3501317382 & 4554.947937370816 & 0\\
+\hline
+\end{tabular}
+\end{center}
+
+
+\subsubsection{Grafy euklidesowe}
+
+\begin{center}
+\begin{tabular}{|c|c|c|c|c|}
+\hline
+\multicolumn{5}{|c|}{\textbf{Average Time}}\\
+\hline
+\textbf{n} & 1000-Random & Neighbours & Extended-Neighbours & 2-OPT\\
+\hline
+100 & 5430231666 & 29933333 & 2909718333 & 5610398333\\
+\hline
+200 & 11033958333 & 108678333 & 22288358333 & 47841571666\\
+\hline
+300 & 15708336666 & 238925000 & 71815146666 & 149125501666\\
+\hline
+400 & 21969775000 & 420680000 & 168567516666 & 340063338333\\
+\hline
+500 & 26306493333 & 644906666 & 327083776666 & 689031216666\\
+\hline
+600 & 33492466666 & 941325000 & 568170671666 & 1224798638333\\
+\hline
+700 & 40003946666 & 1280896666 & 907097273333 & 1902227616666\\
+\hline
+800 & 46368281666 & 1705881666 & 1352010363333 & 2914841420000\\
+\hline
+900 & 49810670000 & 2115170000 & 1857726728333 & 3970601576666\\
+\hline
+1000 & 53497760000 & 2547503333 & 2548862593333 & 5568105215000\\
+\hline
+\end{tabular}
+\end{center}
+
+
+\begin{center}
+\begin{tabular}{|c|c|c|c|c|}
+\hline
+\multicolumn{5}{|c|}{\textbf{Maximum Time}}\\
+\hline
+100 & 56904000 & 321200 & 30141400 & 66528500\\
+\hline
+200 & 113894700 & 1158400 & 234500000 & 519662900\\
+\hline
+300 & 164992700 & 2442400 & 726804400 & 1549853100\\
+\hline
+400 & 232275800 & 4327000 & 1701320800 & 3590054900\\
+\hline
+500 & 286456400 & 6665100 & 3415103000 & 7359945700\\
+\hline
+600 & 349887600 & 9601400 & 5758347300 & 13165101000\\
+\hline
+700 & 426304400 & 13348700 & 9258026500 & 20301730000\\
+\hline
+800 & 485403100 & 18255900 & 13873937600 & 31742944800\\
+\hline
+900 & 510576800 & 21615300 & 18716893000 & 41209877500\\
+\hline
+1000 & 555995400 & 26168200 & 25734825600 & 57516775300\\
+\hline
+\end{tabular}
+\end{center}
+
+
+\begin{center}
+\begin{tabular}{|c|c|c|c|c|}
+\hline
+\multicolumn{5}{|c|}{\textbf{Average PRD}}\\
+\hline
+\textbf{n} & 1000-Random & Neighbours & Extended-Neighbours & 2-OPT\\
+\hline
+100 & 45057.17215979038 & 2590.834778478913 & 1152.047375520498 & 0\\
+\hline
+200 & 75024.50161461842 & 2064.382965833475 & 1126.787169849889 & 0\\
+\hline
+300 & 95586.47736955529 & 2089.941890785232 & 1319.4679540953857 & 0\\
+\hline
+400 & 115379.31540464885 & 1936.2643602499013 & 1170.3148715360107 & 0\\
+\hline
+500 & 129969.40868945165 & 1916.510105455013 & 1432.3355018206873 & 0\\
+\hline
+600 & 147132.99203529008 & 1877.0634799785885 & 1325.9108020407148 & 0\\
+\hline
+700 & 158377.07578069592 & 1780.3974674441433 & 1334.865053976823 & 0\\
+\hline
+800 & 173366.5990915691 & 2018.4858325151736 & 1443.038050374855 & 0\\
+\hline
+900 & 184435.2199324318 & 1859.5850439135654 & 1345.825159240164 & 0\\
+\hline
+1000 & 197381.2850131005 & 2066.702637095026 & 1479.7361632179882 & 0\\
+\hline
+\end{tabular}
+\end{center}
+
+
+\subsection{Wykresy}
+
+\subsubsection{Grafy asymetryczne}
+
+\begin{center}
+\includegraphics[width=\textwidth, 
+                   height = 0.4\textheight, 
+                   keepaspectratio]
+                  {generated_asym_avg_prd} 
+\end{center}
+
+\begin{center}
+\includegraphics[width=\textwidth, 
+                   height = 0.4\textheight, 
+                   keepaspectratio]
+                  {generated_asym_avg_prd_no_krandom} 
+\end{center}
+
+\begin{center}
+\includegraphics[width=\textwidth, 
+                   height = 0.4\textheight, 
+                   keepaspectratio]
+                  {generated_asym_avg_time} 
+\end{center}
+
+\begin{center}
+\includegraphics[width=\textwidth, 
+                   height = 0.4\textheight, 
+                   keepaspectratio]
+                  {generated_asym_max_time} 
+\end{center}
+
+\subsubsection{Grafy symetryczne}
+
+\begin{center}
+\includegraphics[width=\textwidth, 
+                   height = 0.4\textheight, 
+                   keepaspectratio]
+                  {generated_sym_avg_prd} 
+\end{center}
+
+\begin{center}
+\includegraphics[width=\textwidth, 
+                   height = 0.4\textheight, 
+                   keepaspectratio]
+                  {generated_sym_avg_prd_no_krandom} 
+\end{center}
+
+\begin{center}
+\includegraphics[width=\textwidth, 
+                   height = 0.4\textheight, 
+                   keepaspectratio]
+                  {generated_sym_avg_time} 
+\end{center}
+
+\begin{center}
+\includegraphics[width=\textwidth, 
+                   height = 0.4\textheight, 
+                   keepaspectratio]
+                  {generated_sym_max_time} 
+\end{center}
+
+\subsubsection{Grafy euklidesowe}
+
+\begin{center}
+\includegraphics[width=\textwidth, 
+                   height = 0.4\textheight, 
+                   keepaspectratio]
+                  {generated_euclid_avg_prd} 
+\end{center}
+
+\begin{center}
+\includegraphics[width=\textwidth, 
+                   height = 0.4\textheight, 
+                   keepaspectratio]
+                  {generated_euclid_avg_prd_no_krandom} 
+\end{center}
+
+\begin{center}
+\includegraphics[width=\textwidth, 
+                   height = 0.4\textheight, 
+                   keepaspectratio]
+                  {generated_euclid_avg_time} 
+\end{center}
+
+\begin{center}
+\includegraphics[width=\textwidth, 
+                   height = 0.4\textheight, 
+                   keepaspectratio]
+                  {generated_euclid_max_time} 
+\end{center}
+
 
 \end{document}
