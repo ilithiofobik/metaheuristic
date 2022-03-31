@@ -61,21 +61,21 @@ pub fn test_tsplib() {
                             let (val, _) = alg::k_random(&m, 1000);
                             let duration = start.elapsed().as_nanos();
                             avg_prd_k_rand = avg_prd_k_rand + val;
-                            avg_time_k_rand = avg_time_k_rand + duration / 10.0;
+                            avg_time_k_rand = avg_time_k_rand + duration / 10;
                             max_time_k_rand = max(max_time_k_rand, duration);
 
                             let start = Instant::now();
                             let (val, _) = alg::extended_nearest_neighbor(&m);
                             let duration = start.elapsed().as_nanos();
                             avg_prd_ext_neigh = avg_prd_ext_neigh + val;
-                            avg_time_ext_neig = avg_time_ext_neig + duration / 10.0;
+                            avg_time_ext_neig = avg_time_ext_neig + duration / 10;
                             max_time_ext_neig = max(max_time_ext_neig, duration);
 
                             let start = Instant::now();
                             let (val, _) = alg::two_opt(&m, true);
                             let duration = start.elapsed().as_nanos();
                             avg_prd_2_opt = avg_prd_2_opt + val;
-                            avg_time_2_opt = avg_time_2_opt + duration / 10.0;
+                            avg_time_2_opt = avg_time_2_opt + duration / 10;
                             max_time_2_opt = max(max_time_2_opt, duration);
                         }
 
@@ -251,20 +251,20 @@ pub fn test_time_optimality(generate: fn(usize) -> Matrix, matrix_type: &str) {
         let new_results_avg_time = format!(
             "{};{};{};{};{}\n",
             i * 100,
-            avg_val_rand_time * 10,
-            avg_val_neigh_time * 10,
-            avg_val_ext_neigh_time * 10,
-            avg_val_opt_time * 10
+            avg_val_rand_time / 10,
+            avg_val_neigh_time / 10,
+            avg_val_ext_neigh_time / 10,
+            avg_val_opt_time / 10
         );
         result_avg_time.push_str(&new_results_avg_time);
 
         let new_results_avg_prd = format!(
             "{};{};{};{};{}\n",
             i * 100,
-            avg_val_rand_prd * 10.0,
-            avg_val_neigh_prd * 10.0,
-            avg_val_ext_neigh_prd * 10.0,
-            avg_val_opt_prd * 10.0
+            avg_val_rand_prd / 10.0,
+            avg_val_neigh_prd / 10.0,
+            avg_val_ext_neigh_prd / 10.0,
+            avg_val_opt_prd / 10.0
         );
         result_avg_prd.push_str(&new_results_avg_prd);
     }
@@ -337,10 +337,10 @@ pub fn two_opt_test(generate: fn(usize) -> Matrix, matrix_type: &str) {
             i * 50,
             max_val_rand_time,
             max_val_ext_neigh_time,
-            avg_val_rand_time * 10,
-            avg_val_ext_neigh_time * 10,
-            avg_val_rand_prd * 10.0,
-            avg_val_ext_neigh_prd * 10.0
+            avg_val_rand_time / 10,
+            avg_val_ext_neigh_time / 10,
+            avg_val_rand_prd / 10.0,
+            avg_val_ext_neigh_prd / 10.0
         );
         result.push_str(&new_results);
     }
