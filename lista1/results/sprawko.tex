@@ -595,5 +595,189 @@
                   {generated_euclid_max_time} 
 \end{center}
 
+\subsection{Wnioski}
+
+
+\section{Porównanie 2-OPT w zależności od przybliżenia początkowego}
+\subsection{Tabele}
+
+\subsubsection{Grafy asymetryczne}
+
+\begin{center}
+\begin{tabular}{|c|c|c|c|c|c|c|}
+\hline
+\multicolumn{7}{|c|}{\textbf{Asymmetric Graphs with 2-OPT}}\\
+\hline
+ & \multicolumn{2}{|c|}{\textbf{AVG Time}} & \multicolumn{2}{|c|}{\textbf{MAX Time}} & \multicolumn{2}{|c|}{\textbf{AVG PRD}}\\
+\hline
+\textbf{n} & 1000-Random & Ext-Neighbours & 1000-Random & Ext-Neighbours & 1000-Random & Ext-Neighbours\\
+\hline
+50 & 48453200 & 6136500 & 3738398333 & 489811666 & 35597.04376268311 & 0\\
+\hline
+100 & 140853600 & 35301100 & 11970911666 & 3169770000 & 73004.9758129217 & 0\\
+\hline
+150 & 337295400 & 98910400 & 29113163333 & 9698358333 & 96256.98438783734 & 0\\
+\hline
+200 & 643440000 & 222620100 & 58731895000 & 21984178333 & 119059.65961691776 & 0\\
+\hline
+250 & 1392918200 & 438522000 & 123776605000 & 43217630000 & 144661.62881606517 & 0\\
+\hline
+300 & 1981728700 & 744836600 & 181790746666 & 72750526666 & 168466.84457767615 & 0\\
+\hline
+350 & 3127470800 & 1156490900 & 294949878333 & 114528933333 & 201839.59192018144 & 0\\
+\hline
+400 & 4895469300 & 1719545200 & 434607098333 & 170149210000 & 219001.69640333427 & 0\\
+\hline
+450 & 6997186800 & 2429447700 & 638500593333 & 241024308333 & 231538.9713570598 & 0\\
+\hline
+500 & 10230351100 & 3378707200 & 905001025000 & 331310758333 & 249834.60481496935 & 0\\
+\hline
+\end{tabular}
+\end{center}
+
+
+\subsubsection{Grafy symetryczne}
+
+\begin{center}
+\begin{tabular}{|c|c|c|c|c|c|c|}
+\hline
+\multicolumn{7}{|c|}{\textbf{Symmetric Graphs with 2-OPT}}\\
+\hline
+ & \multicolumn{2}{|c|}{\textbf{AVG Time}} & \multicolumn{2}{|c|}{\textbf{MAX Time}} & \multicolumn{2}{|c|}{\textbf{AVG PRD}}\\
+\hline
+\textbf{n} & 1000-Random & Ext-Neighbours & 1000-Random & Ext-Neighbours & 1000-Random & Ext-Neighbours\\
+\hline
+50 & 54974700 & 8059300 & 4912670000 & 742475000 & 435.01603975448376 & 0\\
+\hline
+100 & 263593200 & 79644600 & 24933430000 & 6215445000 & 296.5871346219297 & 76.26814793409217\\
+\hline
+150 & 854941600 & 252056300 & 79812985000 & 21103678333 & 562.0643403667292 & 0\\
+\hline
+200 & 1974940700 & 463551300 & 190022033333 & 43272870000 & 386.77781639316737 & 0\\
+\hline
+250 & 3901226900 & 977426600 & 381697053333 & 91518833333 & 435.57918990772185 & 0\\
+\hline
+300 & 6813259300 & 1703896100 & 653903618333 & 152749565000 & 527.1451034832014 & 0\\
+\hline
+350 & 10818486000 & 2609217900 & 1042695165000 & 247398490000 & 371.06322593105233 & 0\\
+\hline
+400 & 15996929900 & 4046430100 & 1577727018333 & 354304303333 & 351.7245426245308 & 0\\
+\hline
+450 & 22753961100 & 5739451900 & 2246563521666 & 524977991666 & 510.1009193872297 & 0\\
+\hline
+500 & 31306288200 & 7293158000 & 3088863130000 & 682899385000 & 423.6764076969968 & 0\\
+\hline
+\end{tabular}
+\end{center}
+
+
+\subsubsection{Grafy euklidesowe}
+
+\begin{center}
+\begin{tabular}{|c|c|c|c|c|c|c|}
+\hline
+\multicolumn{7}{|c|}{\textbf{Euclid Graphs with 2-OPT}}\\
+\hline
+ & \multicolumn{2}{|c|}{\textbf{AVG Time}} & \multicolumn{2}{|c|}{\textbf{MAX Time}} & \multicolumn{2}{|c|}{\textbf{AVG PRD}}\\
+\hline
+\textbf{n} & 1000-Random & Ext-Neighbours & 1000-Random & Ext-Neighbours & 1000-Random & Ext-Neighbours\\
+\hline
+50 & 50845700 & 7325400 & 4806420000 & 695278000 & 2596.308721025397 & 0\\
+\hline
+100 & 236384300 & 50275900 & 22503444000 & 4360152000 & 4683.4335972388535 & 0\\
+\hline
+150 & 748642900 & 159204100 & 71871182000 & 15081932000 & 4791.206250105386 & 0\\
+\hline
+200 & 1752181800 & 360983300 & 173144656000 & 33194196000 & 5703.476754080477 & 0\\
+\hline
+250 & 3597519600 & 719419300 & 336032994000 & 66473034000 & 6640.879179142622 & 0\\
+\hline
+300 & 6177012400 & 1247142900 & 584690090000 & 115264876000 & 8480.93216294145 & 0\\
+\hline
+350 & 9811912400 & 2034889600 & 950499916000 & 179479596000 & 8406.706667218925 & 0\\
+\hline
+400 & 14885090600 & 2743647200 & 1429223796000 & 263122394000 & 9456.626662228227 & 0\\
+\hline
+450 & 20679005000 & 3990645200 & 2027474658000 & 374963440000 & 10298.344279214956 & 0\\
+\hline
+500 & 30105890700 & 5752855600 & 2857272732000 & 527189884000 & 10733.905445781715 & 0\\
+\hline
+\end{tabular}
+\end{center}
+
+
+
+\subsection{Wykresy}
+
+\subsubsection{Grafy asymetryczne}
+
+\begin{center}
+\includegraphics[width=\textwidth, 
+                   height = 0.4\textheight, 
+                   keepaspectratio]
+                  {two_opt_asym_avg_time} 
+\end{center}
+
+\begin{center}
+\includegraphics[width=\textwidth, 
+                   height = 0.4\textheight, 
+                   keepaspectratio]
+                  {two_opt_asym_max_time} 
+\end{center}
+
+\begin{center}
+\includegraphics[width=\textwidth, 
+                   height = 0.4\textheight, 
+                   keepaspectratio]
+                  {two_opt_asym_avg_prd} 
+\end{center}
+
+\subsubsection{Grafy symetryczne}
+
+\begin{center}
+\includegraphics[width=\textwidth, 
+                   height = 0.4\textheight, 
+                   keepaspectratio]
+                  {two_opt_sym_avg_time} 
+\end{center}
+
+\begin{center}
+\includegraphics[width=\textwidth, 
+                   height = 0.4\textheight, 
+                   keepaspectratio]
+                  {two_opt_sym_max_time} 
+\end{center}
+
+\begin{center}
+\includegraphics[width=\textwidth, 
+                   height = 0.4\textheight, 
+                   keepaspectratio]
+                  {two_opt_sym_avg_prd} 
+\end{center}
+
+\subsubsection{Grafy euklidesowe}
+
+\begin{center}
+\includegraphics[width=\textwidth, 
+                   height = 0.4\textheight, 
+                   keepaspectratio]
+                  {two_opt_euclid_avg_time} 
+\end{center}
+
+\begin{center}
+\includegraphics[width=\textwidth, 
+                   height = 0.4\textheight, 
+                   keepaspectratio]
+                  {two_opt_euclid_max_time} 
+\end{center}
+
+\begin{center}
+\includegraphics[width=\textwidth, 
+                   height = 0.4\textheight, 
+                   keepaspectratio]
+                  {two_opt_euclid_avg_prd} 
+\end{center}
+                  
+\subsection{Wnioski}
 
 \end{document}
