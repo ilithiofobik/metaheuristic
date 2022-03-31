@@ -613,6 +613,12 @@ W każdej rodzinie grafów PRD jest najmniejsze dla algorytmu $2-OPT$ i najwięk
 
 \subsection{Wnioski}
 
+W każdej rodzinie grafów najlepsze wyniki (najniższe PRD) miał algorytm 2-OPT z przybliżeniem początkowym Extended Neighbours. Dla grafów asymetrycznych zbliżone wyniki miał sam algorytm Extended Neighbours. Zdecydowanie najgorsze, rosnące liniowo PRD, miał w każdym przypadku algorytm 1000-Random.
+
+Pod względem czasu najlepszy był algorytm Neighbours, który był nieznacznie szybszy od 1000-Random (losowe dane są jak widać generowane powoli). W przypadku rodzin grafów symetrycznych i euklidesowych kolejnym, znacznie wolniejszym algorytmem był algorytm Extended Neighbours (ponieważ wykonuje algorytm Neighbours n razy), a stawkę zamykał korzystający z niego dla początkowego przybliżenia 2-OPT. W przypadku algorytmów asymetrycznych wyniki czasowe dla Extended Neighbours i 2-OPT były bardzo zbliżone.
+
+Algorytm 1000-Random nie jest w żadnym stopniu alternatywą dla innych testowanych algorytmów. Jeśli zależy nam na czasie, powinniśmy użyć delikatnie szybszego, a dającego nieporównywalnie lepsze wyniki algorytmu Neighbours, natomiast jeśli zależy nam na jakości rozwiązania, zdecydowanie najlepszy, choć i najwolniejszy jest algorytm 2-OPT (a dla grafów asymetrycznych również Extended Neighbours).
+
 
 \section{Porównanie 2-OPT w zależności od przybliżenia początkowego}
 \subsection{Tabele}
@@ -795,5 +801,9 @@ W każdej rodzinie grafów PRD jest najmniejsze dla algorytmu $2-OPT$ i najwięk
 \end{center}
                   
 \subsection{Wnioski}
+
+W tym eksperymencie testowany był algorytm 2-OPT z przybliżeniem początkowym na podstawie 1000-Random oraz Extended Neighbours. Pomimo znacznie dłuższego wykonywania się algorytmu Extended Neighbours, co widać w poprzednim eksperymencie, dla każdego typu grafów algorytm korzystający z początkowego przybliżenia 1000-Random był znacznie wolniejszy. Jego PRD natomiast rosło również liniowo w stosunku do lepszego w praktycznie każdym miejscu algorytmu z Extended Neighbours.
+
+Zatem w przypadku 2-OPT bardzo ważne jest początkowe przybliżenie, ponieważ im gorsze początkowe przybliżenie, tym dłużej będzie się wykonywał algorytm oraz tym gorsze wyniki będzie on dawał.
 
 \end{document}
