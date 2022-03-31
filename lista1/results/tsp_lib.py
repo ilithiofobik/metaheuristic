@@ -29,7 +29,7 @@ for row in plots:
 
 plt.clf()
 plt.xlabel('n')
-plt.ylabel('PRD')
+plt.ylabel('PRD(%)')
 plt.title('Average PRD Plot')
 plt.scatter(x, favg_prd_k_rand, label='1000-Random')
 plt.scatter(x, favg_prd_ext_neigh, label='Extended-Neighbour')

@@ -26,9 +26,8 @@ fn tsp_name(filename: &str) -> String {
 
 pub fn test_tsplib() {
     let files = [
-        "a280", "berlin52", "ch130", "ch150", "eil51", "eil76", "lin105", "pcb442", "pr76",
-        "rd100", "st70", "tsp225",
-    ]; //pr1002
+        "eil51", "berlin52", "st70", "pr76", "rd100", "lin105", "ch130", "ch150", "tsp225", "a280", "pcb442", "pr1002",
+    ];
 
     let mut result_all = String::new();
     let mut result_prd = String::new();
@@ -62,21 +61,21 @@ pub fn test_tsplib() {
                             let (val, _) = alg::k_random(&m, 1000);
                             let duration = start.elapsed().as_nanos();
                             avg_prd_k_rand = avg_prd_k_rand + val;
-                            avg_time_k_rand = avg_time_k_rand + duration;
+                            avg_time_k_rand = avg_time_k_rand + duration / 10.0;
                             max_time_k_rand = max(max_time_k_rand, duration);
 
                             let start = Instant::now();
                             let (val, _) = alg::extended_nearest_neighbor(&m);
                             let duration = start.elapsed().as_nanos();
                             avg_prd_ext_neigh = avg_prd_ext_neigh + val;
-                            avg_time_ext_neig = avg_time_ext_neig + duration;
+                            avg_time_ext_neig = avg_time_ext_neig + duration / 10.0;
                             max_time_ext_neig = max(max_time_ext_neig, duration);
 
                             let start = Instant::now();
                             let (val, _) = alg::two_opt(&m, true);
                             let duration = start.elapsed().as_nanos();
                             avg_prd_2_opt = avg_prd_2_opt + val;
-                            avg_time_2_opt = avg_time_2_opt + duration;
+                            avg_time_2_opt = avg_time_2_opt + duration / 10.0;
                             max_time_2_opt = max(max_time_2_opt, duration);
                         }
 
@@ -217,8 +216,7 @@ pub fn test_time_optimality(generate: fn(usize) -> Matrix, matrix_type: &str) {
                 min(neigh_best_val, min(ext_neigh_best_val, opt_best_val)),
             );
 
-            let prd_k_rand =
-                ((k_rand_best_val as f64 - min_val as f64) / min_val as f64) * 100.0;
+            let prd_k_rand = ((k_rand_best_val as f64 - min_val as f64) / min_val as f64) * 100.0;
             let prd_neigh = ((neigh_best_val as f64 - min_val as f64) / min_val as f64) * 100.0;
             let prd_ext_neigh =
                 ((ext_neigh_best_val as f64 - min_val as f64) / min_val as f64) * 100.0;
@@ -275,9 +273,21 @@ pub fn test_time_optimality(generate: fn(usize) -> Matrix, matrix_type: &str) {
     println!("{}", &result_avg_time);
     println!("{}", &result_avg_prd);
 
-    fs::write(format!("results/generated_{}_test_prd.txt", matrix_type), result_avg_prd).expect("Unable to write file");
-    fs::write(format!("results/generated_{}_test_avg_time.txt", matrix_type), result_avg_time).expect("Unable to write file");
-    fs::write(format!("results/generated_{}_test_max_time.txt", matrix_type), result_max_time).expect("Unable to write file");
+    fs::write(
+        format!("results/generated_{}_test_prd.txt", matrix_type),
+        result_avg_prd,
+    )
+    .expect("Unable to write file");
+    fs::write(
+        format!("results/generated_{}_test_avg_time.txt", matrix_type),
+        result_avg_time,
+    )
+    .expect("Unable to write file");
+    fs::write(
+        format!("results/generated_{}_test_max_time.txt", matrix_type),
+        result_max_time,
+    )
+    .expect("Unable to write file");
 }
 
 pub fn two_opt_test(generate: fn(usize) -> Matrix, matrix_type: &str) {
@@ -308,8 +318,7 @@ pub fn two_opt_test(generate: fn(usize) -> Matrix, matrix_type: &str) {
 
             let min_val = min(k_rand_best_val, ext_neigh_best_val);
 
-            let prd_k_rand =
-                ((k_rand_best_val as f64 - min_val as f64) / min_val as f64) * 100.0;
+            let prd_k_rand = ((k_rand_best_val as f64 - min_val as f64) / min_val as f64) * 100.0;
             let prd_ext_neigh =
                 ((ext_neigh_best_val as f64 - min_val as f64) / min_val as f64) * 100.0;
 
@@ -338,5 +347,6 @@ pub fn two_opt_test(generate: fn(usize) -> Matrix, matrix_type: &str) {
 
     println!("{}", &result);
 
-    fs::write(format!("results/two_opt_{}_test.txt", matrix_type), result).expect("Unable to write file");
+    fs::write(format!("results/two_opt_{}_test.txt", matrix_type), result)
+        .expect("Unable to write file");
 }
