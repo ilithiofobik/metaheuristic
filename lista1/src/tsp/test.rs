@@ -73,7 +73,7 @@ pub fn test_tsplib() {
                             max_time_ext_neig = max(max_time_ext_neig, duration);
 
                             let start = Instant::now();
-                            let (val, _) = alg::two_opt(&m);
+                            let (val, _) = alg::two_opt(&m, true);
                             let duration = start.elapsed().as_nanos();
                             avg_prd_2_opt = avg_prd_2_opt + val;
                             avg_time_2_opt = avg_time_2_opt + duration;
@@ -172,66 +172,171 @@ pub fn test_k_random(gen: fn(usize) -> Matrix, filename: &str) {
     fs::write(filename, result_prd).expect("Unable to write file");
 }
 
-pub fn test_time_optimality() {
-    let mut result_time = String::from("n;k_rand;neigh;ext-neigh;opt\n");
-    let mut result_optimality = String::from("n;k_rand;neigh;ext-neigh;opt\n");
+pub fn test_time_optimality(generate: fn(usize) -> Matrix, matrix_type: &str) {
+    let mut result_max_time = String::from("");
+    let mut result_avg_time = String::from("");
+    let mut result_avg_prd = String::from("");
 
-    for n in 1..30 {
-        let m = gen::create_euclid(n * 10);
+    for i in 1..11 {
+        let mut max_val_rand_time = 0;
+        let mut max_val_neigh_time = 0;
+        let mut max_val_ext_neigh_time = 0;
+        let mut max_val_opt_time = 0;
+        let mut avg_val_rand_time = 0;
+        let mut avg_val_rand_prd = 0.0;
+        let mut avg_val_neigh_time = 0;
+        let mut avg_val_neigh_prd = 0.0;
+        let mut avg_val_ext_neigh_time = 0;
+        let mut avg_val_ext_neigh_prd = 0.0;
+        let mut avg_val_opt_time = 0;
+        let mut avg_val_opt_prd = 0.0;
 
-        let start_k_rand = Instant::now();
-        let (k_rand_best_val, _k_rand_best_perm) = alg::k_random(&m, m.n);
-        let duration_k_rand = start_k_rand.elapsed().as_nanos();
+        println!("{}", i);
 
-        let start_neigh = Instant::now();
-        let (neigh_best_val, _neigh_best_perm) = alg::nearest_neighbor(&m);
-        let duration_neigh = start_neigh.elapsed().as_nanos();
+        for _ in 0..10 {
+            let m = generate(i * 100);
 
-        let start_ext_neigh = Instant::now();
-        let (ext_neigh_best_val, _ext_neigh_best_perm) = alg::extended_nearest_neighbor(&m);
-        let duration_ext_neigh = start_ext_neigh.elapsed().as_nanos();
+            let start_k_rand = Instant::now();
+            let (k_rand_best_val, _k_rand_best_perm) = alg::k_random(&m, 1000);
+            let duration_k_rand = start_k_rand.elapsed().as_nanos();
 
-        let start_opt = Instant::now();
-        let (opt_best_val, _opt_best_perm) = alg::two_opt(&m);
-        let duration_opt = start_opt.elapsed().as_nanos();
+            let start_neigh = Instant::now();
+            let (neigh_best_val, _neigh_best_perm) = alg::nearest_neighbor(&m);
+            let duration_neigh = start_neigh.elapsed().as_nanos();
 
-        // Optymalność
-        let min_val = min(
-            k_rand_best_val,
-            min(neigh_best_val, min(ext_neigh_best_val, opt_best_val)),
-        );
-        // println!("{}", min_val);
-        // println!("{}, {}, {}, {}", k_rand_best_val, neigh_best_val, ext_neigh_best_val, opt_best_val);
+            let start_ext_neigh = Instant::now();
+            let (ext_neigh_best_val, _ext_neigh_best_perm) = alg::extended_nearest_neighbor(&m);
+            let duration_ext_neigh = start_ext_neigh.elapsed().as_nanos();
 
-        let optimality_k_rand =
-            ((k_rand_best_val as f64 - min_val as f64) / min_val as f64) * 100.0;
-        let optimality_neigh = ((neigh_best_val as f64 - min_val as f64) / min_val as f64) * 100.0;
-        let optimality_ext_neigh =
-            ((ext_neigh_best_val as f64 - min_val as f64) / min_val as f64) * 100.0;
-        let optimality_opt = ((opt_best_val as f64 - min_val as f64) / min_val as f64) * 100.0;
+            let start_opt = Instant::now();
+            let (opt_best_val, _opt_best_perm) = alg::two_opt(&m, true);
+            let duration_opt = start_opt.elapsed().as_nanos();
 
-        // Uzupełnianie wynikowych stringów
-        let new_results_time = format!(
+            let min_val = min(
+                k_rand_best_val,
+                min(neigh_best_val, min(ext_neigh_best_val, opt_best_val)),
+            );
+
+            let prd_k_rand =
+                ((k_rand_best_val as f64 - min_val as f64) / min_val as f64) * 100.0;
+            let prd_neigh = ((neigh_best_val as f64 - min_val as f64) / min_val as f64) * 100.0;
+            let prd_ext_neigh =
+                ((ext_neigh_best_val as f64 - min_val as f64) / min_val as f64) * 100.0;
+            let prd_opt = ((opt_best_val as f64 - min_val as f64) / min_val as f64) * 100.0;
+
+            avg_val_rand_prd = avg_val_rand_prd + prd_k_rand;
+            avg_val_neigh_prd = avg_val_neigh_prd + prd_neigh;
+            avg_val_ext_neigh_prd = avg_val_ext_neigh_prd + prd_ext_neigh;
+            avg_val_opt_prd = avg_val_opt_prd + prd_opt;
+
+            max_val_rand_time = max(max_val_rand_time, duration_k_rand);
+            max_val_neigh_time = max(max_val_neigh_time, duration_neigh);
+            max_val_ext_neigh_time = max(max_val_ext_neigh_time, duration_ext_neigh);
+            max_val_opt_time = max(max_val_opt_time, duration_opt);
+
+            avg_val_rand_time = avg_val_rand_time + duration_k_rand;
+            avg_val_neigh_time = avg_val_neigh_time + duration_neigh;
+            avg_val_ext_neigh_time = avg_val_ext_neigh_time + duration_ext_neigh;
+            avg_val_opt_time = avg_val_opt_time + duration_opt;
+        }
+
+        let new_results_max_time = format!(
             "{};{};{};{};{}\n",
-            n * 10,
-            duration_k_rand,
-            duration_neigh,
-            duration_ext_neigh,
-            duration_opt
+            i * 100,
+            max_val_rand_time,
+            max_val_neigh_time,
+            max_val_ext_neigh_time,
+            max_val_opt_time
         );
-        result_time.push_str(&new_results_time);
+        result_max_time.push_str(&new_results_max_time);
 
-        let new_results_optimality = format!(
+        let new_results_avg_time = format!(
             "{};{};{};{};{}\n",
-            n * 10,
-            optimality_k_rand,
-            optimality_neigh,
-            optimality_ext_neigh,
-            optimality_opt
+            i * 100,
+            avg_val_rand_time * 10,
+            avg_val_neigh_time * 10,
+            avg_val_ext_neigh_time * 10,
+            avg_val_opt_time * 10
         );
-        result_optimality.push_str(&new_results_optimality);
+        result_avg_time.push_str(&new_results_avg_time);
+
+        let new_results_avg_prd = format!(
+            "{};{};{};{};{}\n",
+            i * 100,
+            avg_val_rand_prd * 10.0,
+            avg_val_neigh_prd * 10.0,
+            avg_val_ext_neigh_prd * 10.0,
+            avg_val_opt_prd * 10.0
+        );
+        result_avg_prd.push_str(&new_results_avg_prd);
     }
 
-    println!("{}", &result_time);
-    println!("{}", &result_optimality);
+    println!("{}", &result_max_time);
+    println!("{}", &result_avg_time);
+    println!("{}", &result_avg_prd);
+
+    fs::write(format!("results/generated_{}_test_prd.txt", matrix_type), result_avg_prd).expect("Unable to write file");
+    fs::write(format!("results/generated_{}_test_avg_time.txt", matrix_type), result_avg_time).expect("Unable to write file");
+    fs::write(format!("results/generated_{}_test_max_time.txt", matrix_type), result_max_time).expect("Unable to write file");
+}
+
+pub fn two_opt_test(generate: fn(usize) -> Matrix, matrix_type: &str) {
+    let mut result = String::from("");
+
+    for i in 1..11 {
+        let mut max_val_rand_time = 0;
+        let mut max_val_rand_prd = 0.0;
+        let mut max_val_ext_neigh_time = 0;
+        let mut max_val_ext_neigh_prd = 0.0;
+        let mut avg_val_rand_time = 0;
+        let mut avg_val_rand_prd = 0.0;
+        let mut avg_val_ext_neigh_time = 0;
+        let mut avg_val_ext_neigh_prd = 0.0;
+
+        println!("{}", i);
+
+        for _ in 0..10 {
+            let m = generate(i * 50);
+
+            let start_k_rand = Instant::now();
+            let (k_rand_best_val, _k_rand_best_perm) = alg::two_opt(&m, false);
+            let duration_k_rand = start_k_rand.elapsed().as_nanos();
+
+            let start_ext_neigh = Instant::now();
+            let (ext_neigh_best_val, _ext_neigh_best_perm) = alg::two_opt(&m, true);
+            let duration_ext_neigh = start_ext_neigh.elapsed().as_nanos();
+
+            let min_val = min(k_rand_best_val, ext_neigh_best_val);
+
+            let prd_k_rand =
+                ((k_rand_best_val as f64 - min_val as f64) / min_val as f64) * 100.0;
+            let prd_ext_neigh =
+                ((ext_neigh_best_val as f64 - min_val as f64) / min_val as f64) * 100.0;
+
+            avg_val_rand_prd = avg_val_rand_prd + prd_k_rand;
+            avg_val_ext_neigh_prd = avg_val_ext_neigh_prd + prd_ext_neigh;
+
+            max_val_rand_time = max(max_val_rand_time, duration_k_rand);
+            max_val_ext_neigh_time = max(max_val_ext_neigh_time, duration_ext_neigh);
+
+            avg_val_rand_time = avg_val_rand_time + duration_k_rand;
+            avg_val_ext_neigh_time = avg_val_ext_neigh_time + duration_ext_neigh;
+        }
+
+        let new_results = format!(
+            "{};{};{};{};{};{};{}\n",
+            i * 50,
+            max_val_rand_time,
+            max_val_ext_neigh_time,
+            avg_val_rand_time * 10,
+            avg_val_ext_neigh_time * 10,
+            avg_val_rand_prd * 10.0,
+            avg_val_ext_neigh_prd * 10.0
+        );
+        result.push_str(&new_results);
+    }
+
+    println!("{}", &result);
+
+    fs::write(format!("results/two_opt_{}_test.txt", matrix_type), result).expect("Unable to write file");
 }

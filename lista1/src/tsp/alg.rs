@@ -149,8 +149,14 @@ fn change_value(
     return 0;
 }
 
-pub fn two_opt(matrix: &Matrix) -> (u64, Vec<usize>) {
-    let (mut best_value, mut best_perm) = extended_nearest_neighbor(&matrix);
+// approx_type = true -> extended_nearest_neighbor
+// approx_type = false -> 1000-random
+pub fn two_opt(matrix: &Matrix, approx_type: bool) -> (u64, Vec<usize>) {
+    let (mut best_value, mut best_perm) = if approx_type {
+            extended_nearest_neighbor(&matrix)
+        } else {
+            k_random(&matrix, 1000)
+        };
     let n = matrix.n;
     let mut found_better = true;
     let mut best_change;
