@@ -1,6 +1,8 @@
 extern crate rand;
 
 use super::geo::Matrix;
+use rand::seq::SliceRandom;
+use rand::Rng;
 
 pub fn objective_function(permutation: &Vec<usize>, matrix: &Matrix) -> u64 {
     let n = matrix.n;
@@ -11,6 +13,38 @@ pub fn objective_function(permutation: &Vec<usize>, matrix: &Matrix) -> u64 {
     }
 
     return cost;
+}
+
+pub fn k_random(matrix: &Matrix, k: usize) -> (u64, Vec<usize>) {
+    let mut vec: Vec<usize> = (0..matrix.n).collect();
+    let mut best_perm: Vec<usize> = Vec::new();
+    let mut best_value = u64::MAX;
+
+    for _ in 0..k {
+        let slice: &mut [usize] = &mut vec;
+        let mut rng = rand::thread_rng();
+
+        slice.shuffle(&mut rng);
+
+        let new_value = objective_function(&slice.to_vec(), &matrix);
+
+        if best_value > new_value {
+            best_value = new_value;
+            best_perm = Vec::new();
+            for x in slice {
+                best_perm.push(*x);
+            }
+        }
+    }
+
+    return (best_value, best_perm);
+}
+
+pub fn nearest_neighbor(matrix: &Matrix) -> (u64, Vec<usize>) {
+    let mut rng = rand::thread_rng();
+    let start_vertex = rng.gen_range(0..matrix.n);
+
+    return nearest_neighbor_count(matrix, start_vertex);
 }
 
 pub fn extended_nearest_neighbor(matrix: &Matrix) -> (u64, Vec<usize>) {
@@ -115,8 +149,14 @@ pub fn change_value(
     return 0;
 }
 
-pub fn two_opt(matrix: &Matrix) -> (u64, Vec<usize>) {
-    let (mut best_value, mut best_perm) = extended_nearest_neighbor(&matrix);
+// approx_type = true -> extended_nearest_neighbor
+// approx_type = false -> 1000-random
+pub fn two_opt(matrix: &Matrix, approx_type: bool) -> (u64, Vec<usize>) {
+    let (mut best_value, mut best_perm) = if approx_type {
+            extended_nearest_neighbor(&matrix)
+        } else {
+            k_random(&matrix, 1000)
+        };
     let n = matrix.n;
     let mut found_better = true;
     let mut best_change;

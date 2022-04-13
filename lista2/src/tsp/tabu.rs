@@ -3,8 +3,12 @@ use super::geo::Matrix;
 use std::collections::VecDeque;
 use std::time::Instant;
 
-pub fn tabu_search(matrix: &Matrix) -> (u64, Vec<usize>) {
-    let (mut best_value, mut best_perm) = alg::two_opt(&matrix);
+use pyo3::prelude::*;
+use pyo3::wrap_pyfunction;
+
+#[pyfunction]
+fn tabu_search(matrix: &Matrix) -> PyResult<(u64, Vec<usize>)> {
+    let (mut best_value, mut best_perm) = alg::two_opt(&matrix, true);
 
     let tabu_list: VecDeque<u32> = VecDeque::with_capacity(13);
 
@@ -54,5 +58,5 @@ pub fn tabu_search(matrix: &Matrix) -> (u64, Vec<usize>) {
         
     }
 
-    return (best_value, best_perm);
+    return Ok((best_value, best_perm));
 }

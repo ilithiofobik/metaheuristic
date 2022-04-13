@@ -1,3 +1,6 @@
+use pyo3::prelude::*;
+use pyo3::types::PyType;
+
 #[derive(Debug)]
 pub struct Point {
     pub x: i64,
@@ -13,24 +16,28 @@ impl Point {
     }
 }
 
-#[derive(Debug)]
+
+#[pyclass]
 pub struct Matrix {
     pub n: usize,
     pub matrix: Vec<u64>,
 }
 
-#[allow(dead_code)]
+#[pymethods]
 impl Matrix {
+    #[new]
+    pub fn new(n: usize) -> Matrix {
+        let matrix = vec![0; n * n];
+        return Matrix { n, matrix };
+    }
+    
+    #[text_signature = "($self, x, y)"]
     pub fn get(&self, x: usize, y: usize) -> u64 {
         return self.matrix[x * self.n + y];
     }
 
+    #[text_signature = "($self, x, y, value)"]
     pub fn put(&mut self, x: usize, y: usize, value: u64) {
         self.matrix[x * self.n + y] = value;
-    }
-
-    pub fn new(n: usize) -> Matrix {
-        let matrix = vec![0; n * n];
-        return Matrix { n, matrix };
     }
 }
