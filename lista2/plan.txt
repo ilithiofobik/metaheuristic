@@ -1,0 +1,23 @@
+1. Implementacja deterministyczna vs implementacja probabilistyczna.
+- deterministyczna
+2. Wyboru rozwiązania początkowego.
+- 2opt z extneigh na początku
+3. Definicji sąsiedztwa (ruchu).
+- invert
+4. Sposób przeglądu sąsiedztwa.
+-  for w forze
+5. Struktura, długość i sposób obsługi pamięci krótkoterminowej (lista tabu).
+- VecDeque, param(13 top), 
+6. Pamięć długoterminowa.
+- najlepsze rozwiązanie i jego tabu
+7. Wykrywanie cykli/stagnacji + mechanizm resetów/powrotów.
+- zmienna licząca ile czasu już bez poprawy, jak n iteracji bez poprawy wróć do dołka i jeszcze raz rusz, zrób tak raz 
+8. Warunek stopu algorytmu.
+- czas?
+- przez 10 * n iteracji nie znalazł lepszego rozwiązania
+9. Optymalizacje kodu.
+- ta z n^3 do n^2
+10. Wykorzystanie obliczeń równoległych.
+- praca na n wątkach
+
+Uwaga: najważniejszy element to przeszukiwanie otoczenia
