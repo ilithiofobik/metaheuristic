@@ -13,6 +13,7 @@ fn tabu_search(matrix_base: &mut Matrix, tabu_size: usize) -> PyResult<(u64, Vec
     let (mut best_value, mut best_perm) = alg::two_opt(&matrix_base, true);
     let mut best_perm_arc = Arc::new(best_perm.clone());
     let mut tabu_list: VecDeque<Vec<usize>> = VecDeque::with_capacity(tabu_size);
+    tabu_list.push_back(best_perm.clone());
     let mut tabu_list_arc = Arc::new(tabu_list.clone());
 
     let n = matrix_base.n;
