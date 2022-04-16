@@ -18,6 +18,7 @@ impl Point {
 
 
 #[pyclass]
+#[derive(Clone)]
 pub struct Matrix {
     pub n: usize,
     pub matrix: Vec<u64>,
