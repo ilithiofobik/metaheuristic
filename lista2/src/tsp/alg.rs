@@ -111,7 +111,7 @@ pub fn reverse(perm: &mut Vec<usize>, x: usize, y: usize) {
     }
 }
 
-pub fn change_value(
+fn change_value(
     perm: &Vec<usize>,
     matrix: &Matrix,
     first: usize,
@@ -149,14 +149,62 @@ pub fn change_value(
     return 0;
 }
 
+pub fn change_value_swap(perm: &Vec<usize>, matrix: &Matrix, first: usize, last: usize) -> u64 {
+    let n = matrix.n;
+
+    let prev_first = (first + n - 1) % n;
+    let succ_first = (first + 1) % n;
+    let prev_last = (last + n - 1) % n;
+    let succ_last = (last + 1) % n;
+
+    let old_val = {
+        if succ_first == last {
+            matrix.get(perm[prev_first], perm[first])
+                + matrix.get(perm[first], perm[last])
+                + matrix.get(perm[last], perm[succ_last])
+        } else if succ_last == first {
+            matrix.get(perm[prev_last], perm[last])
+                + matrix.get(perm[last], perm[first])
+                + matrix.get(perm[first], perm[succ_first])
+        } else {
+            matrix.get(perm[prev_first], perm[first])
+                + matrix.get(perm[first], perm[succ_first])
+                + matrix.get(perm[prev_last], perm[last])
+                + matrix.get(perm[last], perm[succ_last])
+        }
+    };
+
+    let new_val = {
+        if succ_first == last {
+            matrix.get(perm[prev_first], perm[last])
+                + matrix.get(perm[last], perm[first])
+                + matrix.get(perm[first], perm[succ_last])
+        } else if succ_last == first {
+            matrix.get(perm[prev_last], perm[first])
+                + matrix.get(perm[first], perm[last])
+                + matrix.get(perm[last], perm[succ_first])
+        } else {
+            matrix.get(perm[prev_first], perm[last])
+                + matrix.get(perm[last], perm[succ_first])
+                + matrix.get(perm[prev_last], perm[first])
+                + matrix.get(perm[first], perm[succ_last])
+        }
+    };
+
+    if new_val < old_val {
+        return old_val - new_val;
+    }
+    return 0;
+}
+
 // approx_type = true -> extended_nearest_neighbor
 // approx_type = false -> 1000-random
 pub fn two_opt(matrix: &Matrix, approx_type: bool) -> (u64, Vec<usize>) {
     let (mut best_value, mut best_perm) = if approx_type {
-            extended_nearest_neighbor(&matrix)
-        } else {
-            k_random(&matrix, 1000)
-        };
+        extended_nearest_neighbor(&matrix)
+    } else {
+        k_random(&matrix, 1000)
+    };
     let n = matrix.n;
     let mut found_better = true;
     let mut best_change;
