@@ -3,6 +3,8 @@ extern crate rand;
 use super::geo::Matrix;
 use rand::seq::SliceRandom;
 use rand::Rng;
+use std::collections::VecDeque;
+
 
 pub fn objective_function(permutation: &Vec<usize>, matrix: &Matrix) -> u64 {
     let n = matrix.n;
@@ -149,7 +151,7 @@ fn change_value(
     return 0;
 }
 
-pub fn change_value_swap(perm: &Vec<usize>, matrix: &Matrix, first: usize, last: usize) -> u64 {
+pub fn change_value_swap(perm: &Vec<usize>, matrix: &Matrix, first: usize, last: usize) -> i64 {
     let n = matrix.n;
 
     let prev_first = (first + n - 1) % n;
@@ -172,7 +174,7 @@ pub fn change_value_swap(perm: &Vec<usize>, matrix: &Matrix, first: usize, last:
                 + matrix.get(perm[prev_last], perm[last])
                 + matrix.get(perm[last], perm[succ_last])
         }
-    };
+    } as i64;
 
     let new_val = {
         if succ_first == last {
@@ -189,12 +191,9 @@ pub fn change_value_swap(perm: &Vec<usize>, matrix: &Matrix, first: usize, last:
                 + matrix.get(perm[prev_last], perm[first])
                 + matrix.get(perm[first], perm[succ_last])
         }
-    };
+    } as i64;
 
-    if new_val < old_val {
-        return old_val - new_val;
-    }
-    return 0;
+    return old_val - new_val
 }
 
 // approx_type = true -> extended_nearest_neighbor
@@ -246,4 +245,40 @@ pub fn two_opt(matrix: &Matrix, approx_type: bool) -> (u64, Vec<usize>) {
     }
 
     return (best_value, best_perm);
+}
+
+// checking if the diff between perm1 and perm2 is a swap (i, j)
+fn perms_swap(perm1: &Vec<usize>, perm2: &Vec<usize>, i: usize, j: usize, n: usize) -> bool {
+    for k in 0..i {
+        if perm1[k] != perm2[k] {
+            return false
+        }
+    }
+    if perm1[i] == perm2[i] {
+        return false
+    }
+    for k in i + 1..j {
+        if perm1[k] != perm2[k] {
+            return false
+        }
+    }
+    if perm1[j] == perm2[j] {
+        return false
+    }
+    for k in j + 1..n {
+        if perm1[k] != perm2[k] {
+            return false
+        }
+    }
+
+    return true
+}
+
+pub fn perm_on_tabu(tabu: &VecDeque<Vec<usize>>, perm1: &Vec<usize>, i: usize, j: usize, n: usize) -> bool {
+    for perm2 in tabu {
+        if perms_swap(perm1, perm2, i, j, n) {
+            return true
+        }
+    }
+    return false
 }
