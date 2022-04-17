@@ -11,7 +11,7 @@ use std::time::Instant;
 
 #[pyfunction]
 fn tabu_search(matrix_base: &mut Matrix, tabu_size: usize) -> PyResult<(u64, Vec<usize>)> {
-    let (mut best_value, best_perm) = alg::two_opt(&matrix_base, true);
+    let (mut best_value, best_perm) = alg::two_opt(matrix_base, true);
     let mut tabu_list: VecDeque<Vec<usize>> = VecDeque::with_capacity(tabu_size);
     tabu_list.push_back(best_perm.clone());
     let tabu_list = Arc::new(RwLock::new(tabu_list));
@@ -25,8 +25,6 @@ fn tabu_search(matrix_base: &mut Matrix, tabu_size: usize) -> PyResult<(u64, Vec
     let matrix = Arc::new(matrix_base.clone());
 
     while start.elapsed().as_nanos() < max_time && last_change < n {
-        last_change = last_change + 1;
-
         let mut global_best_i = 0;
         let mut global_best_j = 0;
         let mut global_best_change = std::i64::MIN;
@@ -36,7 +34,6 @@ fn tabu_search(matrix_base: &mut Matrix, tabu_size: usize) -> PyResult<(u64, Vec
 
         for t in 0..num_of_threads {
             let matrix_clone = Arc::clone(&matrix);
-            let step = num_of_threads.clone();
             let tx_t = tx.clone();
             let tabu_clone = Arc::clone(&tabu_list);
             let best_perm_clone = Arc::clone(&best_perm);
@@ -48,7 +45,7 @@ fn tabu_search(matrix_base: &mut Matrix, tabu_size: usize) -> PyResult<(u64, Vec
                 let tabu = tabu_clone.read().unwrap();
                 let perm = best_perm_clone.read().unwrap();
 
-                for i in (t..n - 1).step_by(step) {
+                for i in (t..n - 1).step_by(num_of_threads) {
                     for j in i + 1..n {
                         let new_change = alg::change_value_swap(&perm, &matrix_clone, i, j);
                         if new_change > best_change && alg::perm_on_tabu(&tabu, &perm, i, j, n) {
@@ -91,10 +88,10 @@ fn tabu_search(matrix_base: &mut Matrix, tabu_size: usize) -> PyResult<(u64, Vec
         if global_best_change > 0 {
             last_change = 0;
         } else {
-            last_change = last_change + 1;
+            last_change += 1;
         }
     }
 
     let perm = best_perm.read().unwrap();
-    return Ok((best_value, perm.clone()));
+    Ok((best_value, perm.clone()))
 }

@@ -2,19 +2,17 @@ extern crate rand;
 
 use super::geo::Matrix;
 use rand::seq::SliceRandom;
-use rand::Rng;
 use std::collections::VecDeque;
 
-
-pub fn objective_function(permutation: &Vec<usize>, matrix: &Matrix) -> u64 {
+pub fn objective_function(permutation: &[usize], matrix: &Matrix) -> u64 {
     let n = matrix.n;
     let mut cost = matrix.get(permutation[n - 1], permutation[0]);
 
     for i in 1..n {
-        cost = cost + matrix.get(permutation[i - 1], permutation[i]);
+        cost += matrix.get(permutation[i - 1], permutation[i]);
     }
 
-    return cost;
+    cost
 }
 
 pub fn k_random(matrix: &Matrix, k: usize) -> (u64, Vec<usize>) {
@@ -28,7 +26,7 @@ pub fn k_random(matrix: &Matrix, k: usize) -> (u64, Vec<usize>) {
 
         slice.shuffle(&mut rng);
 
-        let new_value = objective_function(&slice.to_vec(), &matrix);
+        let new_value = objective_function(&slice.to_vec(), matrix);
 
         if best_value > new_value {
             best_value = new_value;
@@ -39,14 +37,7 @@ pub fn k_random(matrix: &Matrix, k: usize) -> (u64, Vec<usize>) {
         }
     }
 
-    return (best_value, best_perm);
-}
-
-pub fn nearest_neighbor(matrix: &Matrix) -> (u64, Vec<usize>) {
-    let mut rng = rand::thread_rng();
-    let start_vertex = rng.gen_range(0..matrix.n);
-
-    return nearest_neighbor_count(matrix, start_vertex);
+    (best_value, best_perm)
 }
 
 pub fn extended_nearest_neighbor(matrix: &Matrix) -> (u64, Vec<usize>) {
@@ -61,7 +52,7 @@ pub fn extended_nearest_neighbor(matrix: &Matrix) -> (u64, Vec<usize>) {
         }
     }
 
-    return (best_value, best_perm);
+    (best_value, best_perm)
 }
 
 fn nearest_neighbor_count(matrix: &Matrix, first_vertex: usize) -> (u64, Vec<usize>) {
@@ -87,19 +78,19 @@ fn nearest_neighbor_count(matrix: &Matrix, first_vertex: usize) -> (u64, Vec<usi
         }
 
         current_vertex = closest_town;
-        final_value = final_value + best_value;
+        final_value += best_value;
         final_perm.push(current_vertex as usize);
 
         let index = unvisited.iter().position(|x| *x == current_vertex).unwrap();
         unvisited.remove(index);
     }
 
-    final_value = final_value + matrix.get(current_vertex, first_vertex);
+    final_value += matrix.get(current_vertex, first_vertex);
 
-    return (final_value, final_perm);
+    (final_value, final_perm)
 }
 
-pub fn reverse(perm: &mut Vec<usize>, x: usize, y: usize) {
+pub fn reverse(perm: &mut [usize], x: usize, y: usize) {
     let mut i = x;
     let mut j = y;
     let mut temp: usize;
@@ -108,18 +99,18 @@ pub fn reverse(perm: &mut Vec<usize>, x: usize, y: usize) {
         temp = perm[i];
         perm[i] = perm[j];
         perm[j] = temp;
-        i = i + 1;
-        j = j - 1;
+        i += 1;
+        j -= 1;
     }
 }
 
 fn change_value(
-    perm: &Vec<usize>,
+    perm: &[usize],
     matrix: &Matrix,
     first: usize,
     last: usize,
-    old_sums: &Vec<u64>,
-    new_sums: &Vec<u64>,
+    old_sums: &[u64],
+    new_sums: &[u64],
 ) -> u64 {
     let n = matrix.n;
 
@@ -148,10 +139,10 @@ fn change_value(
     if new_val < old_val {
         return old_val - new_val;
     }
-    return 0;
+    0
 }
 
-pub fn change_value_swap(perm: &Vec<usize>, matrix: &Matrix, first: usize, last: usize) -> i64 {
+pub fn change_value_swap(perm: &[usize], matrix: &Matrix, first: usize, last: usize) -> i64 {
     let n = matrix.n;
 
     let prev_first = (first + n - 1) % n;
@@ -193,16 +184,16 @@ pub fn change_value_swap(perm: &Vec<usize>, matrix: &Matrix, first: usize, last:
         }
     } as i64;
 
-    return old_val - new_val
+    old_val - new_val
 }
 
 // approx_type = true -> extended_nearest_neighbor
 // approx_type = false -> 1000-random
 pub fn two_opt(matrix: &Matrix, approx_type: bool) -> (u64, Vec<usize>) {
     let (mut best_value, mut best_perm) = if approx_type {
-        extended_nearest_neighbor(&matrix)
+        extended_nearest_neighbor(matrix)
     } else {
-        k_random(&matrix, 1000)
+        k_random(matrix, 1000)
     };
     let n = matrix.n;
     let mut found_better = true;
@@ -229,7 +220,7 @@ pub fn two_opt(matrix: &Matrix, approx_type: bool) -> (u64, Vec<usize>) {
 
         for i in 0..matrix.n - 1 {
             for j in i + 1..matrix.n {
-                let new_change = change_value(&best_perm, &matrix, i, j, &old_sums, &new_sums);
+                let new_change = change_value(&best_perm, matrix, i, j, &old_sums, &new_sums);
                 if new_change > best_change {
                     found_better = true;
                     best_i = i;
@@ -240,45 +231,51 @@ pub fn two_opt(matrix: &Matrix, approx_type: bool) -> (u64, Vec<usize>) {
         }
         if found_better {
             reverse(&mut best_perm, best_i, best_j);
-            best_value = best_value - best_change;
+            best_value -= best_change;
         }
     }
 
-    return (best_value, best_perm);
+    (best_value, best_perm)
 }
 
 // checking if the diff between perm1 and perm2 is a swap (i, j)
-fn perms_swap(perm1: &Vec<usize>, perm2: &Vec<usize>, i: usize, j: usize, n: usize) -> bool {
+fn perms_swap(perm1: &[usize], perm2: &[usize], i: usize, j: usize, n: usize) -> bool {
     for k in 0..i {
         if perm1[k] != perm2[k] {
-            return false
+            return false;
         }
     }
     if perm1[i] == perm2[i] {
-        return false
+        return false;
     }
     for k in i + 1..j {
         if perm1[k] != perm2[k] {
-            return false
+            return false;
         }
     }
     if perm1[j] == perm2[j] {
-        return false
+        return false;
     }
     for k in j + 1..n {
         if perm1[k] != perm2[k] {
-            return false
+            return false;
         }
     }
 
-    return true
+    true
 }
 
-pub fn perm_on_tabu(tabu: &VecDeque<Vec<usize>>, perm1: &Vec<usize>, i: usize, j: usize, n: usize) -> bool {
+pub fn perm_on_tabu(
+    tabu: &VecDeque<Vec<usize>>,
+    perm1: &[usize],
+    i: usize,
+    j: usize,
+    n: usize,
+) -> bool {
     for perm2 in tabu {
         if perms_swap(perm1, perm2, i, j, n) {
-            return true
+            return true;
         }
     }
-    return false
+    false
 }

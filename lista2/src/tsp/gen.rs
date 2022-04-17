@@ -22,13 +22,13 @@ pub fn create_euclid(size: usize) -> Matrix {
         let pi = &coords[&i];
         for j in 0..i {
             let pj = &coords[&j];
-            let val = pi.distance(&pj);
+            let val = pi.distance(pj);
             matrix.put(i, j, val);
             matrix.put(j, i, val);
         }
     }
 
-    return matrix;
+    matrix
 }
 
 #[allow(dead_code)]
@@ -48,7 +48,7 @@ pub fn create_atsp(size: usize) -> Matrix {
         }
     }
 
-    return matrix;
+    matrix
 }
 
 #[allow(dead_code)]
@@ -65,5 +65,5 @@ pub fn create_tsp(size: usize) -> Matrix {
         }
     }
 
-    return matrix;
+    matrix
 }

@@ -5,7 +5,7 @@ use std::fs::File;
 use std::io::prelude::*;
 
 #[allow(dead_code)]
-pub fn read_euclid(contents: &String) -> std::io::Result<Matrix> {
+pub fn read_euclid(contents: &str) -> std::io::Result<Matrix> {
     let mut counter = 0;
 
     let mut lines = contents.lines();
@@ -19,7 +19,7 @@ pub fn read_euclid(contents: &String) -> std::io::Result<Matrix> {
         .unwrap()
         .trim_start_matches("DIMENSION")
         .trim()
-        .trim_start_matches(":")
+        .trim_start_matches(':')
         .trim()
         .parse()
         .unwrap();
@@ -42,7 +42,7 @@ pub fn read_euclid(contents: &String) -> std::io::Result<Matrix> {
 
         coords.insert(counter, Point { x, y });
 
-        counter = counter + 1;
+        counter += 1;
         fragment = lines.next();
     }
 
@@ -50,17 +50,17 @@ pub fn read_euclid(contents: &String) -> std::io::Result<Matrix> {
         let pi = &coords[&i];
         for j in 0..i {
             let pj = &coords[&j];
-            let val = pi.distance(&pj);
+            let val = pi.distance(pj);
             matrix.put(i, j, val);
             matrix.put(j, i, val);
         }
     }
 
-    return Ok(matrix);
+    Ok(matrix)
 }
 
 #[allow(dead_code)]
-pub fn read_full_matrix(contents: &String) -> std::io::Result<Matrix> {
+pub fn read_full_matrix(contents: &str) -> std::io::Result<Matrix> {
     let mut counter = 0;
 
     let mut lines = contents.lines();
@@ -74,7 +74,7 @@ pub fn read_full_matrix(contents: &String) -> std::io::Result<Matrix> {
         .unwrap()
         .trim_start_matches("DIMENSION")
         .trim()
-        .trim_start_matches(":")
+        .trim_start_matches(':')
         .trim()
         .parse()
         .unwrap();
@@ -94,17 +94,17 @@ pub fn read_full_matrix(contents: &String) -> std::io::Result<Matrix> {
             let fval: f64 = word.parse().unwrap();
             let val = fval as u64;
             matrix.put(counter / size, counter % size, val);
-            counter = counter + 1;
+            counter += 1;
         }
 
         fragment = lines.next();
     }
 
-    return Ok(matrix);
+    Ok(matrix)
 }
 
 #[allow(dead_code)]
-pub fn read_lower_matrix(contents: &String) -> std::io::Result<Matrix> {
+pub fn read_lower_matrix(contents: &str) -> std::io::Result<Matrix> {
     let mut x = 0;
     let mut y = 0;
 
@@ -119,7 +119,7 @@ pub fn read_lower_matrix(contents: &String) -> std::io::Result<Matrix> {
         .unwrap()
         .trim_start_matches("DIMENSION")
         .trim()
-        .trim_start_matches(":")
+        .trim_start_matches(':')
         .trim()
         .parse()
         .unwrap();
@@ -143,16 +143,16 @@ pub fn read_lower_matrix(contents: &String) -> std::io::Result<Matrix> {
 
             if x == y {
                 y = 0;
-                x = x + 1;
+                x += 1;
             } else {
-                y = y + 1;
+                y += 1;
             }
         }
 
         fragment = lines.next();
     }
 
-    return Ok(matrix);
+    Ok(matrix)
 }
 
 #[allow(dead_code)]
@@ -172,6 +172,7 @@ pub fn read_file(filename: &str) -> std::io::Result<Matrix> {
     panic!("Wrong format.");
 }
 
+#[allow(dead_code)]
 pub fn read_tour(filename: &str) -> std::io::Result<Vec<usize>> {
     let mut file = File::open(filename)?;
     let mut contents = String::new();
@@ -209,5 +210,5 @@ pub fn read_tour(filename: &str) -> std::io::Result<Vec<usize>> {
         fragment = lines.next();
     }
 
-    return Ok(perm);
+    Ok(perm)
 }
