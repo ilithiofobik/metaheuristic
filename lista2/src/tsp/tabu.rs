@@ -5,16 +5,17 @@ use pyo3::prelude::*;
 use std::collections::VecDeque;
 use std::sync::mpsc;
 use std::sync::Arc;
+use std::sync::RwLock;
 use std::thread;
 use std::time::Instant;
 
 #[pyfunction]
 fn tabu_search(matrix_base: &mut Matrix, tabu_size: usize) -> PyResult<(u64, Vec<usize>)> {
-    let (mut best_value, mut best_perm) = alg::two_opt(&matrix_base, true);
-    let mut best_perm_arc = Arc::new(best_perm.clone());
+    let (mut best_value, best_perm) = alg::two_opt(&matrix_base, true);
     let mut tabu_list: VecDeque<Vec<usize>> = VecDeque::with_capacity(tabu_size);
     tabu_list.push_back(best_perm.clone());
-    let mut tabu_list_arc = Arc::new(tabu_list.clone());
+    let tabu_list = Arc::new(RwLock::new(tabu_list));
+    let best_perm = Arc::new(RwLock::new(best_perm));
 
     let n = matrix_base.n;
     let num_of_threads = num_cpus::get();
@@ -34,23 +35,23 @@ fn tabu_search(matrix_base: &mut Matrix, tabu_size: usize) -> PyResult<(u64, Vec
         let (tx, rx) = mpsc::channel();
 
         for t in 0..num_of_threads {
-            let best_perm_clone = Arc::clone(&best_perm_arc);
             let matrix_clone = Arc::clone(&matrix);
-            let tabu_clone = Arc::clone(&tabu_list_arc);
             let step = num_of_threads.clone();
             let tx_t = tx.clone();
+            let tabu_clone = Arc::clone(&tabu_list);
+            let best_perm_clone = Arc::clone(&best_perm);
 
             threads.push(thread::spawn(move || {
                 let mut best_i = 0;
                 let mut best_j = 0;
                 let mut best_change = std::i64::MIN;
+                let tabu = tabu_clone.read().unwrap();
+                let perm = best_perm_clone.read().unwrap();
+
                 for i in (t..n - 1).step_by(step) {
                     for j in i + 1..n {
-                        let new_change =
-                            alg::change_value_swap(&best_perm_clone, &matrix_clone, i, j);
-                        if new_change > best_change
-                            && alg::perm_on_tabu(&tabu_clone, &best_perm_clone, i, j, n)
-                        {
+                        let new_change = alg::change_value_swap(&perm, &matrix_clone, i, j);
+                        if new_change > best_change && alg::perm_on_tabu(&tabu, &perm, i, j, n) {
                             best_i = i;
                             best_j = j;
                             best_change = new_change;
@@ -76,14 +77,16 @@ fn tabu_search(matrix_base: &mut Matrix, tabu_size: usize) -> PyResult<(u64, Vec
             }
         }
 
-        alg::reverse(&mut best_perm, global_best_i, global_best_j);
-        best_perm_arc = Arc::new(best_perm.clone());
+        let mut perm = best_perm.write().unwrap();
+        alg::reverse(&mut perm, global_best_i, global_best_j);
         best_value = (best_value as i64 - global_best_change) as u64;
-        if tabu_list.len() == tabu_size {
-            tabu_list.pop_front();
+
+        let mut tabu = tabu_list.write().unwrap();
+        if tabu.len() == tabu_size {
+            tabu.pop_front();
         }
-        tabu_list.push_back(best_perm.clone());
-        tabu_list_arc = Arc::new(tabu_list.clone());
+        tabu.push_back(perm.clone());
+
         // changed to better solution
         if global_best_change > 0 {
             last_change = 0;
@@ -92,5 +95,6 @@ fn tabu_search(matrix_base: &mut Matrix, tabu_size: usize) -> PyResult<(u64, Vec
         }
     }
 
-    return Ok((best_value, best_perm));
+    let perm = best_perm.read().unwrap();
+    return Ok((best_value, perm.clone()));
 }
