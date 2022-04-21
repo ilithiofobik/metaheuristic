@@ -24,6 +24,15 @@ fn tabu_search(matrix_base: &mut Matrix, tabu_size: usize) -> PyResult<(u64, Vec
     let start = Instant::now();
     let matrix = Arc::new(matrix_base.clone());
 
+
+    let mut returned = 0;
+
+    let mut global_minimum_value = std::i64::MAX;
+    let global_minimum_value = Arc::new(RwLock::new(global_minimum_value));
+
+    let mut global_minimum_tabu_list: VecDeque<Vec<usize>> = VecDeque::with_capacity(tabu_size);
+    let mut global_minimum_perm = best_perm.clone();
+
     while start.elapsed().as_nanos() < max_time && last_change < n {
         let mut global_best_i = 0;
         let mut global_best_j = 0;
@@ -48,7 +57,7 @@ fn tabu_search(matrix_base: &mut Matrix, tabu_size: usize) -> PyResult<(u64, Vec
                 for i in (t..n - 1).step_by(num_of_threads) {
                     for j in i + 1..n {
                         let new_change = alg::change_value_swap(&perm, &matrix_clone, i, j);
-                        if new_change > best_change && alg::perm_on_tabu(&tabu, &perm, i, j, n) {
+                        if new_change > best_change && ((best_value as i64 - new_change) < global_minimum_value.read().unwrap() || !alg::perm_on_tabu(&tabu, &perm, i, j, n)) {
                             best_i = i;
                             best_j = j;
                             best_change = new_change;
@@ -78,6 +87,19 @@ fn tabu_search(matrix_base: &mut Matrix, tabu_size: usize) -> PyResult<(u64, Vec
         alg::reverse(&mut perm, global_best_i, global_best_j);
         best_value = (best_value as i64 - global_best_change) as u64;
 
+        let mut global_minimum = global_minimum_value.write().unwrap();
+
+        if (global_minimum < best_value) {
+            global_minimum = best_value;
+            global_minimum_tabu_list.clear();
+            global_minimum_perm = perm.clone();
+            returned = 0;
+        }
+
+        if (global_tabu.len() < tabu_size) {
+            global_tabu.push_back(perm.clone());
+        }
+
         let mut tabu = tabu_list.write().unwrap();
         if tabu.len() == tabu_size {
             tabu.pop_front();
@@ -89,6 +111,20 @@ fn tabu_search(matrix_base: &mut Matrix, tabu_size: usize) -> PyResult<(u64, Vec
             last_change = 0;
         } else {
             last_change += 1;
+        }
+
+        if (last_change > tabu_size) {
+            tabu = global_minimum_tabu_list; //.clone()?
+            best_value = global_minimum;
+            best_perm = global_minimum_perm.clone();
+        }
+
+        if (best_value == global_minimum) { //czy może porównywać same permutacje, ale jak, skoro to różne obiekty?
+            returned = returned + 1;
+
+            if (returned > 2) {
+                break;
+            }
         }
     }
 
