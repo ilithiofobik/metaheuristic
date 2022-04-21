@@ -1,3 +1,6 @@
+use pyo3::PyResult;
+use pyo3::prelude::pyfunction;
+
 use super::geo::Matrix;
 use super::geo::Point;
 use std::collections::HashMap;
@@ -5,7 +8,7 @@ use std::fs::File;
 use std::io::prelude::*;
 
 #[allow(dead_code)]
-pub fn read_euclid(contents: &str) -> std::io::Result<Matrix> {
+pub fn read_euclid(contents: &str) -> PyResult<Matrix> {
     let mut counter = 0;
 
     let mut lines = contents.lines();
@@ -60,7 +63,7 @@ pub fn read_euclid(contents: &str) -> std::io::Result<Matrix> {
 }
 
 #[allow(dead_code)]
-pub fn read_full_matrix(contents: &str) -> std::io::Result<Matrix> {
+pub fn read_full_matrix(contents: &str) -> PyResult<Matrix> {
     let mut counter = 0;
 
     let mut lines = contents.lines();
@@ -104,7 +107,7 @@ pub fn read_full_matrix(contents: &str) -> std::io::Result<Matrix> {
 }
 
 #[allow(dead_code)]
-pub fn read_lower_matrix(contents: &str) -> std::io::Result<Matrix> {
+pub fn read_lower_matrix(contents: &str) -> PyResult<Matrix> {
     let mut x = 0;
     let mut y = 0;
 
@@ -156,7 +159,8 @@ pub fn read_lower_matrix(contents: &str) -> std::io::Result<Matrix> {
 }
 
 #[allow(dead_code)]
-pub fn read_file(filename: &str) -> std::io::Result<Matrix> {
+#[pyfunction]
+pub fn read_file(filename: &str) -> PyResult<Matrix> {
     let mut file = File::open(filename)?;
     let mut contents = String::new();
     file.read_to_string(&mut contents)?;
@@ -173,7 +177,8 @@ pub fn read_file(filename: &str) -> std::io::Result<Matrix> {
 }
 
 #[allow(dead_code)]
-pub fn read_tour(filename: &str) -> std::io::Result<Vec<usize>> {
+#[pyfunction]
+pub fn read_tour(filename: &str) -> PyResult<Vec<usize>> {
     let mut file = File::open(filename)?;
     let mut contents = String::new();
     file.read_to_string(&mut contents)?;
