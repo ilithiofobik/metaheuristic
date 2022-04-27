@@ -2,7 +2,6 @@ extern crate rand;
 
 use super::geo::Matrix;
 use rand::seq::SliceRandom;
-use std::collections::VecDeque;
 
 pub fn objective_function(permutation: &[usize], matrix: &Matrix) -> u64 {
     let n = matrix.n;
@@ -104,14 +103,14 @@ pub fn reverse(perm: &mut [usize], x: usize, y: usize) {
     }
 }
 
-fn change_value(
+pub fn change_value_invert(
     perm: &[usize],
     matrix: &Matrix,
     first: usize,
     last: usize,
     old_sums: &[u64],
     new_sums: &[u64],
-) -> u64 {
+) -> i64 {
     let n = matrix.n;
 
     let prev = (first + n - 1) % n;
@@ -123,7 +122,7 @@ fn change_value(
         } else {
             matrix.get(perm[last], perm[first])
         }
-    };
+    } as i64;
 
     let mut new_val = {
         if succ != first {
@@ -131,15 +130,12 @@ fn change_value(
         } else {
             matrix.get(perm[first], perm[last])
         }
-    };
+    } as i64;
 
-    old_val = old_val + old_sums[last] - old_sums[first];
-    new_val = new_val + new_sums[first] - new_sums[last];
+    old_val = old_val + old_sums[last] as i64 - old_sums[first] as i64;
+    new_val = new_val + new_sums[first] as i64 - new_sums[last] as i64;
 
-    if new_val < old_val {
-        return old_val - new_val;
-    }
-    0
+    old_val - new_val
 }
 
 pub fn change_value_swap(perm: &[usize], matrix: &Matrix, first: usize, last: usize) -> i64 {
@@ -220,7 +216,8 @@ pub fn two_opt(matrix: &Matrix, approx_type: bool) -> (u64, Vec<usize>) {
 
         for i in 0..matrix.n - 1 {
             for j in i + 1..matrix.n {
-                let new_change = change_value(&best_perm, matrix, i, j, &old_sums, &new_sums);
+                let new_change =
+                    change_value_invert(&best_perm, matrix, i, j, &old_sums, &new_sums);
                 if new_change > best_change {
                     found_better = true;
                     best_i = i;
@@ -231,51 +228,9 @@ pub fn two_opt(matrix: &Matrix, approx_type: bool) -> (u64, Vec<usize>) {
         }
         if found_better {
             reverse(&mut best_perm, best_i, best_j);
-            best_value -= best_change;
+            best_value -= best_change as u64;
         }
     }
 
     (best_value, best_perm)
-}
-
-// checking if the diff between perm1 and perm2 is a swap (i, j)
-fn perms_swap(perm1: &[usize], perm2: &[usize], i: usize, j: usize, n: usize) -> bool {
-    for k in 0..i {
-        if perm1[k] != perm2[k] {
-            return false;
-        }
-    }
-    if perm1[i] == perm2[i] {
-        return false;
-    }
-    for k in i + 1..j {
-        if perm1[k] != perm2[k] {
-            return false;
-        }
-    }
-    if perm1[j] == perm2[j] {
-        return false;
-    }
-    for k in j + 1..n {
-        if perm1[k] != perm2[k] {
-            return false;
-        }
-    }
-
-    true
-}
-
-pub fn perm_on_tabu(
-    tabu: &VecDeque<Vec<usize>>,
-    perm1: &[usize],
-    i: usize,
-    j: usize,
-    n: usize,
-) -> bool {
-    for perm2 in tabu {
-        if perms_swap(perm1, perm2, i, j, n) {
-            return true;
-        }
-    }
-    false
 }

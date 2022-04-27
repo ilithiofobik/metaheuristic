@@ -10,10 +10,18 @@ use std::thread;
 use std::time::Instant;
 
 #[pyfunction]
-fn tabu_search(matrix_base: &mut Matrix, tabu_size: usize) -> PyResult<(u64, Vec<usize>)> {
+fn tabu_search(
+    matrix_base: &mut Matrix,
+    tabu_size: usize,
+    swap_change: bool,
+) -> PyResult<(u64, Vec<usize>)> {
+    // swap_change - true if swap, false if invert, no other options
+    // if tabu_size == 0, then tabu_size = n
+
+    let swap_change = Arc::new(swap_change);
     let n = matrix_base.n;
     let tabu_size = if tabu_size != 0 { tabu_size } else { n };
-    let (mut best_value, best_perm) = alg::two_opt(matrix_base, true);
+    let (best_value, best_perm) = alg::two_opt(matrix_base, true);
 
     let mut global_minimum_tabu_list: VecDeque<(usize, usize)> = VecDeque::with_capacity(tabu_size);
     let mut global_minimum_perm = best_perm.clone();
@@ -49,6 +57,7 @@ fn tabu_search(matrix_base: &mut Matrix, tabu_size: usize) -> PyResult<(u64, Vec
             let best_perm_clone = Arc::clone(&best_perm);
             let best_value_clone = Arc::clone(&best_value);
             let global_minimum_value_clone = Arc::clone(&global_minimum_value);
+            let swap_change_clone = Arc::clone(&swap_change);
 
             threads.push(thread::spawn(move || {
                 let mut best_i = 0;
@@ -58,19 +67,55 @@ fn tabu_search(matrix_base: &mut Matrix, tabu_size: usize) -> PyResult<(u64, Vec
                 let perm = best_perm_clone.read().unwrap();
                 let value = best_value_clone.read().unwrap();
                 let glo_min = global_minimum_value_clone.read().unwrap();
+                let glo_change = *value - *glo_min;
 
-                for i in (0..n - 1 - t).rev().step_by(num_of_threads) {
-                    for j in i + 1..n {
-                        let new_change = alg::change_value_swap(&perm, &matrix_clone, i, j);
-                        if new_change > best_change
-                            && !((*tabu).contains(&(i, j)))
-                        {
-                            best_i = i;
-                            best_j = j;
-                            best_change = new_change;
+                if *swap_change_clone {
+                    let mut old_sums = vec![0; n];
+                    let mut new_sums = vec![0; n];
+                    // keeping sums of weights from 0 to i in order to calculate cost of path in constant time
+                    for i in 0..n - 1 {
+                        old_sums[i + 1] = old_sums[i] + matrix_clone.get(perm[i], perm[i + 1]);
+                    }
+
+                    // keeping sums of weights from n-1 to i in order to calculate cost of reversed path in constant time
+                    for i in (0..n - 1).rev() {
+                        new_sums[i] = new_sums[i + 1] + matrix_clone.get(perm[i + 1], perm[i]);
+                    }
+
+                    for i in (0..n - 1 - t).rev().step_by(num_of_threads) {
+                        for j in i + 1..n {
+                            let new_change = alg::change_value_invert(
+                                &perm,
+                                &matrix_clone,
+                                i,
+                                j,
+                                &old_sums,
+                                &new_sums,
+                            );
+                            if new_change > best_change
+                                && (!((*tabu).contains(&(i, j))) || new_change > glo_change as i64)
+                            {
+                                best_i = i;
+                                best_j = j;
+                                best_change = new_change;
+                            }
+                        }
+                    }
+                } else {
+                    for i in (0..n - 1 - t).rev().step_by(num_of_threads) {
+                        for j in i + 1..n {
+                            let new_change = alg::change_value_swap(&perm, &matrix_clone, i, j);
+                            if new_change > best_change
+                                && (!((*tabu).contains(&(i, j))) || new_change > glo_change as i64)
+                            {
+                                best_i = i;
+                                best_j = j;
+                                best_change = new_change;
+                            }
                         }
                     }
                 }
+
                 tx_t.send((best_i, best_j, best_change)).unwrap();
             }));
         }
@@ -100,15 +145,13 @@ fn tabu_search(matrix_base: &mut Matrix, tabu_size: usize) -> PyResult<(u64, Vec
         alg::reverse(&mut perm, global_best_i, global_best_j);
         *value = (*value as i64 - global_best_change) as u64;
 
-        {
-            let mut global_minimum = global_minimum_value.write().unwrap();
+        let mut global_minimum = global_minimum_value.write().unwrap();
 
-            if *global_minimum > *value {
-                *global_minimum = *value;
-                global_minimum_tabu_list.clear();
-                global_minimum_perm = perm.clone();
-                returned = 0;
-            }
+        if *global_minimum > *value {
+            *global_minimum = *value;
+            global_minimum_tabu_list.clear();
+            global_minimum_perm = perm.clone();
+            returned = 0;
         }
 
         if global_minimum_tabu_list.len() < tabu_size {
@@ -128,20 +171,19 @@ fn tabu_search(matrix_base: &mut Matrix, tabu_size: usize) -> PyResult<(u64, Vec
             last_change += 1;
         }
 
-        let glo_min = global_minimum_value.read().unwrap();
-
         // nawroty
         if last_change > tabu_size {
+            global_minimum_tabu_list.pop_front();
             *tabu = global_minimum_tabu_list.clone(); //.clone()?
-            *value = *glo_min;
+            *value = *global_minimum;
             *perm = global_minimum_perm.clone();
         }
 
-        if *value == *glo_min {
+        if *value == *global_minimum {
             //czy może porównywać same permutacje, ale jak, skoro to różne obiekty?
             returned += 1;
 
-            if returned > 2 {
+            if returned > tabu_size {
                 break;
             }
         }
@@ -150,5 +192,5 @@ fn tabu_search(matrix_base: &mut Matrix, tabu_size: usize) -> PyResult<(u64, Vec
     let perm = best_perm.read().unwrap();
     let value = best_value.read().unwrap();
 
-    Ok((value.clone(), perm.clone()))
+    Ok((*value, perm.clone()))
 }
