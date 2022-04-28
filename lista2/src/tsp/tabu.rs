@@ -20,7 +20,7 @@ fn tabu_search(
 
     let swap_change = Arc::new(swap_change);
     let n = matrix_base.n;
-    let tabu_size = if tabu_size != 0 { tabu_size } else { n };
+    let tabu_size = if tabu_size != 0 { tabu_size } else { n / 2 };
     let (best_value, best_perm) = alg::two_opt(matrix_base, true);
 
     let mut global_minimum_tabu_list: VecDeque<(usize, usize)> = VecDeque::with_capacity(tabu_size);
@@ -30,8 +30,8 @@ fn tabu_search(
     let tabu_list = Arc::new(RwLock::new(tabu_list));
     let best_perm = Arc::new(RwLock::new(best_perm));
 
-    let num_of_threads = num_cpus::get();
-    let max_time = 1_000_000_000; //1s
+    let num_of_threads = num_cpus::get_physical();
+    let max_time = 10_000_000_000; //10s
     let mut last_change = 0;
     let start = Instant::now();
     let matrix = Arc::new(matrix_base.clone());
@@ -179,8 +179,10 @@ fn tabu_search(
             *perm = global_minimum_perm.clone();
         }
 
-        if *value == *global_minimum {
+        if *perm == global_minimum_perm {
             //czy może porównywać same permutacje, ale jak, skoro to różne obiekty?
+            // czesc pawel, mozna porównywać po prostu przez ==, rust sprawdzi zawartość
+
             returned += 1;
 
             if returned > tabu_size {
@@ -193,4 +195,132 @@ fn tabu_search(
     let value = best_value.read().unwrap();
 
     Ok((*value, perm.clone()))
+}
+
+#[allow(dead_code)]
+#[pyfunction]
+fn tabu_search_no_threads(
+    matrix: &mut Matrix,
+    tabu_size: usize,
+    swap_change: bool,
+) -> PyResult<(u64, Vec<usize>)> {
+    // swap_change - true if swap, false if invert, no other options
+    // if tabu_size == 0, then tabu_size = n
+
+    let n = matrix.n;
+    let tabu_size = if tabu_size != 0 { tabu_size } else { n / 2 };
+    let (mut best_value, mut best_perm) = alg::two_opt(matrix, true);
+    let mut global_minimum_tabu_list: VecDeque<(usize, usize)> = VecDeque::with_capacity(tabu_size);
+    let mut global_minimum_perm = best_perm.clone();
+    let mut tabu_list: VecDeque<(usize, usize)> = VecDeque::with_capacity(tabu_size);
+    let max_time = 10_000_000_000; //10s
+    let mut last_change = 0;
+    let start = Instant::now();
+    let mut returned = 0;
+    let mut global_minimum_value = best_value;
+
+    while start.elapsed().as_nanos() < max_time && last_change < n {
+        let mut global_best_i = 0;
+        let mut global_best_j = 0;
+        let mut global_best_change = std::i64::MIN;
+
+        let mut best_i = 0;
+        let mut best_j = 0;
+        let mut best_change = std::i64::MIN;
+        let glo_change = best_value - global_minimum_value;
+
+        if swap_change {
+            let mut old_sums = vec![0; n];
+            let mut new_sums = vec![0; n];
+            // keeping sums of weights from 0 to i in order to calculate cost of path in constant time
+            for i in 0..n - 1 {
+                old_sums[i + 1] = old_sums[i] + matrix.get(best_perm[i], best_perm[i + 1]);
+            }
+
+            // keeping sums of weights from n-1 to i in order to calculate cost of reversed path in constant time
+            for i in (0..n - 1).rev() {
+                new_sums[i] = new_sums[i + 1] + matrix.get(best_perm[i + 1], best_perm[i]);
+            }
+
+            for i in 0..n - 1 {
+                for j in i + 1..n {
+                    let new_change =
+                        alg::change_value_invert(&best_perm, matrix, i, j, &old_sums, &new_sums);
+                    if new_change > best_change
+                        && (!(tabu_list.contains(&(i, j))) || new_change > glo_change as i64)
+                    {
+                        best_i = i;
+                        best_j = j;
+                        best_change = new_change;
+                    }
+                }
+            }
+        } else {
+            for i in 0..n - 1 {
+                for j in i + 1..n {
+                    let new_change = alg::change_value_swap(&best_perm, matrix, i, j);
+                    if new_change > best_change
+                        && (!(tabu_list.contains(&(i, j))) || new_change > glo_change as i64)
+                    {
+                        best_i = i;
+                        best_j = j;
+                        best_change = new_change;
+                    }
+                }
+            }
+        }
+
+        if global_best_change < best_change {
+            global_best_i = best_i;
+            global_best_j = best_j;
+            global_best_change = best_change;
+        }
+
+        alg::reverse(&mut best_perm, global_best_i, global_best_j);
+        best_value = (best_value as i64 - global_best_change) as u64;
+
+        if global_minimum_value > best_value {
+            global_minimum_value = best_value;
+            global_minimum_tabu_list.clear();
+            global_minimum_perm = best_perm.clone();
+            returned = 0;
+        }
+
+        if global_minimum_tabu_list.len() < tabu_size {
+            global_minimum_tabu_list.push_back((global_best_i, global_best_j));
+        }
+
+        if tabu_list.len() == tabu_size {
+            tabu_list.pop_front();
+        }
+        tabu_list.push_back((global_best_i, global_best_j));
+
+        // changed to better solution
+        if global_best_change > 0 {
+            last_change = 0;
+        } else {
+            last_change += 1;
+        }
+
+        // nawroty
+        if last_change > tabu_size {
+            global_minimum_tabu_list.pop_front();
+            tabu_list = global_minimum_tabu_list.clone(); //.clone()?
+            best_value = global_minimum_value;
+            best_perm = global_minimum_perm.clone();
+        }
+
+        if best_perm == global_minimum_perm {
+            //czy może porównywać same permutacje, ale jak, skoro to różne obiekty?
+            // czesc pawel, mozna porównywać po prostu przez ==, rust sprawdzi zawartość
+
+            returned += 1;
+
+            if returned > tabu_size {
+                break;
+            }
+        }
+    }
+
+    Ok((global_minimum_value, global_minimum_perm))
 }
