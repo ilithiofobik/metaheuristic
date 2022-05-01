@@ -6,8 +6,8 @@ use tsp::alg;
 fn main() {
     //test::test_tsplib();
     let m = gen::create_atsp(200);
-    let (val1, _) = alg::nearest_neighbor(&m);
-    let (val2, _) = alg::extended_nearest_neighbor(&m);
+    let (val1, _) = alg::two_opt(&m, true);
+    let (val2, _) = alg::two_opt(&m, false);
     println!("val1 = {}  val2= {}", val1, val2);
     // test::test_time_optimality(gen::create_tsp, "tsp");
     // test::test_time_optimality(gen::create_euclid, "euclid");

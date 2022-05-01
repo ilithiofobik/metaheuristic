@@ -7,7 +7,7 @@ use std::sync::mpsc;
 use std::sync::Arc;
 use std::sync::RwLock;
 use std::thread;
-use std::time::Instant;
+// use std::time::Instant;
 
 #[pyfunction]
 fn tabu_search(
@@ -31,9 +31,9 @@ fn tabu_search(
     let best_perm = Arc::new(RwLock::new(best_perm));
 
     let num_of_threads = num_cpus::get_physical();
-    let max_time = 10_000_000_000; //10s
+    // let max_time = 10_000_000_000; //10s
     let mut last_change = 0;
-    let start = Instant::now();
+    // let start = Instant::now();
     let matrix = Arc::new(matrix_base.clone());
 
     let mut returned = 0;
@@ -42,7 +42,11 @@ fn tabu_search(
     let global_minimum_value = Arc::new(RwLock::new(global_minimum_value));
     let best_value = Arc::new(RwLock::new(best_value));
 
-    while start.elapsed().as_nanos() < max_time && last_change < n {
+    let mut counter = 0;
+
+    while counter < n * 15 && last_change < n {
+        counter += 1;
+
         let mut global_best_i = 0;
         let mut global_best_j = 0;
         let mut global_best_change = std::i64::MIN;
@@ -126,19 +130,19 @@ fn tabu_search(
                 .expect("The thread creating or execution failed!")
         });
 
-        for x in 0..num_of_threads {
+        for _ in 0..num_of_threads {
             let (new_i, new_j, new_change) = rx.recv().unwrap();
-            println!("Suggestion {}: {},{},{}", x, new_i, new_j, new_change);
+            // println!("Suggestion {}: {},{},{}", x, new_i, new_j, new_change);
             if global_best_change < new_change {
                 global_best_i = new_i;
                 global_best_j = new_j;
                 global_best_change = new_change;
             }
         }
-        println!(
-            "Winning suggestion: {},{},{}",
-            global_best_i, global_best_j, global_best_change
-        );
+        // println!(
+        //     "Winning suggestion: {},{},{}",
+        //     global_best_i, global_best_j, global_best_change
+        // );
 
         let mut perm = best_perm.write().unwrap();
         let mut value = best_value.write().unwrap();
@@ -174,15 +178,12 @@ fn tabu_search(
         // nawroty
         if last_change > tabu_size {
             global_minimum_tabu_list.pop_front();
-            *tabu = global_minimum_tabu_list.clone(); //.clone()?
+            *tabu = global_minimum_tabu_list.clone();
             *value = *global_minimum;
             *perm = global_minimum_perm.clone();
         }
 
         if *perm == global_minimum_perm {
-            //czy może porównywać same permutacje, ale jak, skoro to różne obiekty?
-            // czesc pawel, mozna porównywać po prostu przez ==, rust sprawdzi zawartość
-
             returned += 1;
 
             if returned > tabu_size {
@@ -213,13 +214,17 @@ fn tabu_search_no_threads(
     let mut global_minimum_tabu_list: VecDeque<(usize, usize)> = VecDeque::with_capacity(tabu_size);
     let mut global_minimum_perm = best_perm.clone();
     let mut tabu_list: VecDeque<(usize, usize)> = VecDeque::with_capacity(tabu_size);
-    let max_time = 10_000_000_000; //10s
+    // let max_time = 10_000_000_000; //10s
     let mut last_change = 0;
-    let start = Instant::now();
+    // let start = Instant::now();
     let mut returned = 0;
     let mut global_minimum_value = best_value;
 
-    while start.elapsed().as_nanos() < max_time && last_change < n {
+    let mut counter = 0;
+
+    while counter < n * 15 && last_change < n {
+        counter += 1;
+
         let mut global_best_i = 0;
         let mut global_best_j = 0;
         let mut global_best_change = std::i64::MIN;
@@ -311,9 +316,6 @@ fn tabu_search_no_threads(
         }
 
         if best_perm == global_minimum_perm {
-            //czy może porównywać same permutacje, ale jak, skoro to różne obiekty?
-            // czesc pawel, mozna porównywać po prostu przez ==, rust sprawdzi zawartość
-
             returned += 1;
 
             if returned > tabu_size {
