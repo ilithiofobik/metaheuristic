@@ -8,58 +8,61 @@ import matplotlib.pyplot as plt
 num_of_iter = 3
 compared_options = 3
 
-
-def test_tabu_length(gen, name):
+# jeden test na wszystko, bo musimy miec optimal do prd
+# czas zmieniony na rustowy, ten pythonowy nie jest dokładny
+# TODO: można w sumie zrobić tak że najpierw odpalamy raz 2-opta i dajemy permutację 
+# jako argument żeby nie liczyć 2-opta wiele razy - wtedy testy szybciej przejdą
+def test_tabu(gen, name):
     x = []
 
     y_prd_13 = []
     y_prd_sqrt = []
-    y_prd_n = []
+    y_prd_default = []
+    y_prd_no_threads = []
 
     y_time_13 = []
     y_time_sqrt = []
-    y_time_n = []
+    y_time_default = []
+    y_time_no_threads = []
 
-    for n in range(50, 550, 50):
+    for n in range(50, 450, 50):
         time_13 = 0
         time_sqrt = 0
-        time_n = 0
+        time_default = 0
+        time_no_threads = 0
 
         prd_13 = 0
         prd_sqrt = 0
-        prd_n = 0
+        prd_default = 0
+        prd_no_threads = 0
 
         print(n)
 
         for _ in range(num_of_iter):
             m = gen(n)
 
-            start_time = datetime.now()
-            (val_13, _) = tabu_search(m, 13, True)
-            time_13 = (datetime.now() - start_time).total_seconds() * 1000
+            (val_13, _, time_13) = tabu_search(m, 13, True)
+            (val_sqrt, _, time_sqrt) = tabu_search(m, int(sqrt(n)), True)
+            (val_default, _, time_default) = tabu_search(m, n, True)
+            (val_no_threads, _, time_no_threads) = tabu_search_no_threads(m, n, True)
 
-            start_time = datetime.now()
-            (val_sqrt, _) = tabu_search(m, int(sqrt(n)), True)
-            time_sqrt = (datetime.now() - start_time).total_seconds() * 1000
-
-            start_time = datetime.now()
-            (val_n, _) = tabu_search(m, n, True)
-            time_n = (datetime.now() - start_time).total_seconds() * 1000
-
-            min_val = min(val_13, val_sqrt, val_n)
+            min_val = min(val_13, val_sqrt, val_default, val_no_threads)
             prd_13 += ((val_13 - min_val) / min_val) * 100.0
             prd_sqrt += ((val_sqrt - min_val) / min_val) * 100.0
-            prd_n += ((val_n - min_val) / min_val) * 100.0
+            prd_default += ((val_default - min_val) / min_val) * 100.0
+            prd_no_threads += ((val_no_threads - min_val) / min_val) * 100.0
 
         x.append(n)
 
         y_prd_13.append(prd_13 / num_of_iter)
         y_prd_sqrt.append(prd_sqrt / num_of_iter)
-        y_prd_n.append(prd_n / num_of_iter)
+        y_prd_default.append(prd_default / num_of_iter)
+        y_prd_no_threads.append(prd_no_threads / num_of_iter)
 
         y_time_13.append(time_13 / num_of_iter)
         y_time_sqrt.append(time_sqrt / num_of_iter)
-        y_time_n.append(time_n / num_of_iter)
+        y_time_default.append(time_default / num_of_iter)
+        y_time_no_threads.append(time_no_threads / num_of_iter)
 
     
     # Plots
@@ -70,7 +73,7 @@ def test_tabu_length(gen, name):
     plt.title(name + ' / Tabu List Length / PRD')
     plt.plot(x, y_prd_13, label='13 elements')
     plt.plot(x, y_prd_sqrt, label='sqrt(n) elements')
-    plt.plot(x, y_prd_n, label='n elements')
+    plt.plot(x, y_prd_default, label='n elements')
     plt.legend()
     plt.savefig('results/plots/tabu_' + name.lower() + '_time.png')
 
@@ -80,17 +83,34 @@ def test_tabu_length(gen, name):
     plt.title(name + ' / Tabu List Length / TIME')
     plt.plot(x, y_time_13, label='13 elements')
     plt.plot(x, y_time_sqrt, label='sqrt(n) elements')
-    plt.plot(x, y_time_n, label='n elements')
+    plt.plot(x, y_time_default, label='n elements')
     plt.legend()
     plt.savefig('results/plots/tabu_' + name.lower() + '_prd.png')
 
+    plt.clf()
+    plt.xlabel('n')
+    plt.ylabel('PRD [%]')
+    plt.title(name + ' / Multithreading / PRD')
+    plt.plot(x, y_prd_default, label='multiple threads')
+    plt.plot(x, y_prd_no_threads, label='single thread')
+    plt.legend()
+    plt.savefig('results/plots/multithreading_' + name.lower() + '_time.png')
+
+    plt.clf()
+    plt.xlabel('n')
+    plt.ylabel('Time [milliseconds]')
+    plt.title(name + ' / Multithreading / TIME')
+    plt.plot(x, y_time_default, label='multiple threads')
+    plt.plot(x, y_time_no_threads, label='single thread')
+    plt.legend()
+    plt.savefig('results/plots/multithreading_' + name.lower() + '_prd.png')
 
     # Latex tables
 
     cols = "|" + (compared_options + 1) * "c|"
     text = "\\begin{center}\n\\begin{tabular}{" + cols + "}\n\\hline\n"
     for k in range(len(x)):
-        text += str(x[k]) + " & " + str(y_prd_13[k]) + " & " + str(y_prd_sqrt[k]) + " & " + str(y_prd_n[k]) + "\\\\\n\\hline\n"
+        text += str(x[k]) + " & " + str(y_prd_13[k]) + " & " + str(y_prd_sqrt[k]) + " & " + str(y_prd_default[k]) + "\\\\\n\\hline\n"
     text += "\\end{tabular}\n\\end{center}\n"
 
     with open('results/tables/tabu_' +  name.lower() + '_prd.txt', 'w') as f:
@@ -100,12 +120,31 @@ def test_tabu_length(gen, name):
     cols = "|" + (compared_options + 1) * "c|"
     text = "\\begin{center}\n\\begin{tabular}{" + cols + "}\n\\hline\n"
     for k in range(len(x)):
-        text += str(x[k]) + " & " + str(y_time_13[k]) + " & " + str(y_time_sqrt[k]) + " & " + str(y_time_n[k]) + "\\\\\n\\hline\n"
+        text += str(x[k]) + " & " + str(y_time_13[k]) + " & " + str(y_time_sqrt[k]) + " & " + str(y_time_default[k]) + "\\\\\n\\hline\n"
     text += "\\end{tabular}\n\\end{center}\n"
     
     with open('results/tables/tabu_' +  name.lower() + '_time.txt', 'w') as f:
         f.write(text)
 
+    cols = "|" + 3 * "c|"
+    text = "\\begin{center}\n\\begin{tabular}{" + cols + "}\n\\hline\n"
+    for k in range(len(x)):
+        text += str(x[k]) + " & " + str(y_prd_default[k]) + " & " + str(y_prd_no_threads[k]) + "\\\\\n\\hline\n"
+    text += "\\end{tabular}\n\\end{center}\n"
+
+    with open('results/tables/multithreading' +  name.lower() + '_prd.txt', 'w') as f:
+        f.write(text)
 
 
-test_tabu_length(create_atsp, 'Asymmetric')
+    cols = "|" + 3 * "c|"
+    text = "\\begin{center}\n\\begin{tabular}{" + cols + "}\n\\hline\n"
+    for k in range(len(x)):
+        text += str(x[k]) + " & " + str(y_time_default[k]) + " & " + str(y_time_no_threads[k]) + "\\\\\n\\hline\n"
+    text += "\\end{tabular}\n\\end{center}\n"
+    
+    with open('results/tables/multithreading' +  name.lower() + '_time.txt', 'w') as f:
+        f.write(text)
+
+
+
+test_tabu(create_atsp, 'Asymmetric')

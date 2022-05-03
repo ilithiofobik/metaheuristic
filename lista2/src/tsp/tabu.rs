@@ -7,17 +7,17 @@ use std::sync::mpsc;
 use std::sync::Arc;
 use std::sync::RwLock;
 use std::thread;
-// use std::time::Instant;
+use std::time::Instant;
 
 #[pyfunction]
 fn tabu_search(
     matrix_base: &mut Matrix,
     tabu_size: usize,
     swap_change: bool,
-) -> PyResult<(u64, Vec<usize>)> {
+) -> PyResult<(u64, Vec<usize>, f64)> {
     // swap_change - true if swap, false if invert, no other options
     // if tabu_size == 0, then tabu_size = n
-
+    let start = Instant::now();
     let swap_change = Arc::new(swap_change);
     let n = matrix_base.n;
     let tabu_size = if tabu_size != 0 { tabu_size } else { n / 2 };
@@ -194,8 +194,10 @@ fn tabu_search(
 
     let perm = best_perm.read().unwrap();
     let value = best_value.read().unwrap();
+    let duration = start.elapsed().as_secs_f64();
 
-    Ok((*value, perm.clone()))
+
+    Ok((*value, perm.clone(), duration))
 }
 
 #[allow(dead_code)]
@@ -204,10 +206,11 @@ fn tabu_search_no_threads(
     matrix: &mut Matrix,
     tabu_size: usize,
     swap_change: bool,
-) -> PyResult<(u64, Vec<usize>)> {
+) -> PyResult<(u64, Vec<usize>, f64)> {
     // swap_change - true if swap, false if invert, no other options
     // if tabu_size == 0, then tabu_size = n
 
+    let start = Instant::now();
     let n = matrix.n;
     let tabu_size = if tabu_size != 0 { tabu_size } else { n / 2 };
     let (mut best_value, mut best_perm) = alg::two_opt(matrix, true);
@@ -324,5 +327,6 @@ fn tabu_search_no_threads(
         }
     }
 
-    Ok((global_minimum_value, global_minimum_perm))
+    let duration = start.elapsed().as_secs_f64();
+    Ok((global_minimum_value, global_minimum_perm, duration))
 }
