@@ -2,6 +2,7 @@ extern crate rand;
 
 use super::geo::Matrix;
 use rand::seq::SliceRandom;
+use pyo3::prelude::*;
 
 pub fn objective_function(permutation: &[usize], matrix: &Matrix) -> u64 {
     let n = matrix.n;
@@ -185,7 +186,8 @@ pub fn change_value_swap(perm: &[usize], matrix: &Matrix, first: usize, last: us
 
 // approx_type = true -> extended_nearest_neighbor
 // approx_type = false -> 1000-random
-pub fn two_opt(matrix: &Matrix, approx_type: bool) -> (u64, Vec<usize>) {
+#[pyfunction]
+pub fn two_opt(matrix: &Matrix, approx_type: bool) -> PyResult<(u64, Vec<usize>)> {
     let (mut best_value, mut best_perm) = if approx_type {
         extended_nearest_neighbor(matrix)
     } else {
@@ -232,5 +234,5 @@ pub fn two_opt(matrix: &Matrix, approx_type: bool) -> (u64, Vec<usize>) {
         }
     }
 
-    (best_value, best_perm)
+    Ok((best_value, best_perm))
 }

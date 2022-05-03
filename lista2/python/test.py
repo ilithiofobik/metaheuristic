@@ -25,7 +25,7 @@ def test_tabu(gen, name):
     y_time_default = []
     y_time_no_threads = []
 
-    for n in range(50, 450, 50):
+    for n in range(50, 350, 50):
         time_13 = 0
         time_sqrt = 0
         time_default = 0
@@ -40,13 +40,15 @@ def test_tabu(gen, name):
 
         for _ in range(num_of_iter):
             m = gen(n)
+            (best_value, best_perm) = two_opt(m, True)
 
-            (val_13, _, time_13) = tabu_search(m, 13, True)
-            (val_sqrt, _, time_sqrt) = tabu_search(m, int(sqrt(n)), True)
-            (val_default, _, time_default) = tabu_search(m, n, True)
-            (val_no_threads, _, time_no_threads) = tabu_search_no_threads(m, n, True)
+            (val_13, _, time_13) = tabu_search(m, 13, True, best_value, best_perm)
+            (val_sqrt, _, time_sqrt) = tabu_search(m, int(sqrt(n)), True, best_value, best_perm)
+            (val_default, _, time_default) = tabu_search(m, n, True, best_value, best_perm)
+            (val_no_threads, _, time_no_threads) = tabu_search_no_threads(m, n, True, best_value, best_perm)
 
             min_val = min(val_13, val_sqrt, val_default, val_no_threads)
+            print(f"13={val_13}, sqrt={val_sqrt}, def={val_default}, no_thr={val_no_threads}")
             prd_13 += ((val_13 - min_val) / min_val) * 100.0
             prd_sqrt += ((val_sqrt - min_val) / min_val) * 100.0
             prd_default += ((val_default - min_val) / min_val) * 100.0
@@ -148,3 +150,4 @@ def test_tabu(gen, name):
 
 
 test_tabu(create_atsp, 'Asymmetric')
+test_tabu(create_euclid, 'Euclid')

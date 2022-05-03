@@ -14,6 +14,8 @@ fn tabu_search(
     matrix_base: &mut Matrix,
     tabu_size: usize,
     swap_change: bool,
+    best_value: u64,
+    best_perm: Vec<usize>,
 ) -> PyResult<(u64, Vec<usize>, f64)> {
     // swap_change - true if swap, false if invert, no other options
     // if tabu_size == 0, then tabu_size = n
@@ -21,7 +23,6 @@ fn tabu_search(
     let swap_change = Arc::new(swap_change);
     let n = matrix_base.n;
     let tabu_size = if tabu_size != 0 { tabu_size } else { n / 2 };
-    let (best_value, best_perm) = alg::two_opt(matrix_base, true);
 
     let mut global_minimum_tabu_list: VecDeque<(usize, usize)> = VecDeque::with_capacity(tabu_size);
     let mut global_minimum_perm = best_perm.clone();
@@ -86,7 +87,7 @@ fn tabu_search(
                         new_sums[i] = new_sums[i + 1] + matrix_clone.get(perm[i + 1], perm[i]);
                     }
 
-                    for i in (0..n - 1 - t).rev().step_by(num_of_threads) {
+                    for i in (t..n - 1 - t).rev().step_by(num_of_threads) {
                         for j in i + 1..n {
                             let new_change = alg::change_value_invert(
                                 &perm,
@@ -196,7 +197,6 @@ fn tabu_search(
     let value = best_value.read().unwrap();
     let duration = start.elapsed().as_secs_f64();
 
-
     Ok((*value, perm.clone(), duration))
 }
 
@@ -206,14 +206,18 @@ fn tabu_search_no_threads(
     matrix: &mut Matrix,
     tabu_size: usize,
     swap_change: bool,
+    best_value: u64,
+    best_perm: Vec<usize>,
 ) -> PyResult<(u64, Vec<usize>, f64)> {
     // swap_change - true if swap, false if invert, no other options
     // if tabu_size == 0, then tabu_size = n
+    let mut best_perm = best_perm;
+    let mut best_value = best_value;
 
     let start = Instant::now();
     let n = matrix.n;
     let tabu_size = if tabu_size != 0 { tabu_size } else { n / 2 };
-    let (mut best_value, mut best_perm) = alg::two_opt(matrix, true);
+
     let mut global_minimum_tabu_list: VecDeque<(usize, usize)> = VecDeque::with_capacity(tabu_size);
     let mut global_minimum_perm = best_perm.clone();
     let mut tabu_list: VecDeque<(usize, usize)> = VecDeque::with_capacity(tabu_size);
