@@ -31,7 +31,7 @@ fn tabu_search(
     let tabu_list = Arc::new(RwLock::new(tabu_list));
     let best_perm = Arc::new(RwLock::new(best_perm));
 
-    let num_of_threads = num_cpus::get_physical();
+    let num_of_threads = 1;
     // let max_time = 10_000_000_000; //10s
     let mut last_change = 0;
     // let start = Instant::now();
@@ -140,10 +140,7 @@ fn tabu_search(
                 global_best_change = new_change;
             }
         }
-        // println!(
-        //     "Winning suggestion: {},{},{}",
-        //     global_best_i, global_best_j, global_best_change
-        // );
+
 
         let mut perm = best_perm.write().unwrap();
         let mut value = best_value.write().unwrap();
@@ -211,10 +208,10 @@ fn tabu_search_no_threads(
 ) -> PyResult<(u64, Vec<usize>, f64)> {
     // swap_change - true if swap, false if invert, no other options
     // if tabu_size == 0, then tabu_size = n
+    let start = Instant::now();
     let mut best_perm = best_perm;
     let mut best_value = best_value;
 
-    let start = Instant::now();
     let n = matrix.n;
     let tabu_size = if tabu_size != 0 { tabu_size } else { n / 2 };
 
@@ -235,10 +232,6 @@ fn tabu_search_no_threads(
         let mut global_best_i = 0;
         let mut global_best_j = 0;
         let mut global_best_change = std::i64::MIN;
-
-        let mut best_i = 0;
-        let mut best_j = 0;
-        let mut best_change = std::i64::MIN;
         let glo_change = best_value - global_minimum_value;
 
         if swap_change {
@@ -258,12 +251,12 @@ fn tabu_search_no_threads(
                 for j in i + 1..n {
                     let new_change =
                         alg::change_value_invert(&best_perm, matrix, i, j, &old_sums, &new_sums);
-                    if new_change > best_change
+                    if new_change > global_best_change
                         && (!(tabu_list.contains(&(i, j))) || new_change > glo_change as i64)
                     {
-                        best_i = i;
-                        best_j = j;
-                        best_change = new_change;
+                        global_best_i = i;
+                        global_best_j = j;
+                        global_best_change = new_change;
                     }
                 }
             }
@@ -271,21 +264,15 @@ fn tabu_search_no_threads(
             for i in 0..n - 1 {
                 for j in i + 1..n {
                     let new_change = alg::change_value_swap(&best_perm, matrix, i, j);
-                    if new_change > best_change
+                    if new_change > global_best_change
                         && (!(tabu_list.contains(&(i, j))) || new_change > glo_change as i64)
                     {
-                        best_i = i;
-                        best_j = j;
-                        best_change = new_change;
+                        global_best_i = i;
+                        global_best_j = j;
+                        global_best_change = new_change;
                     }
                 }
             }
-        }
-
-        if global_best_change < best_change {
-            global_best_i = best_i;
-            global_best_j = best_j;
-            global_best_change = best_change;
         }
 
         alg::reverse(&mut best_perm, global_best_i, global_best_j);
