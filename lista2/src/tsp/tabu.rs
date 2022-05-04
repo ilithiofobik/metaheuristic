@@ -87,7 +87,7 @@ fn tabu_search(
                         new_sums[i] = new_sums[i + 1] + matrix_clone.get(perm[i + 1], perm[i]);
                     }
 
-                    for i in (t..n - 1 - t).rev().step_by(num_of_threads) {
+                    for i in (t..n - 1).step_by(num_of_threads) {
                         for j in i + 1..n {
                             let new_change = alg::change_value_invert(
                                 &perm,
@@ -107,7 +107,7 @@ fn tabu_search(
                         }
                     }
                 } else {
-                    for i in (0..n - 1 - t).rev().step_by(num_of_threads) {
+                    for i in (t..n - 1).rev().step_by(num_of_threads) {
                         for j in i + 1..n {
                             let new_change = alg::change_value_swap(&perm, &matrix_clone, i, j);
                             if new_change > best_change

@@ -2,11 +2,21 @@ from cgi import test
 from tsp_tabu import *
 from datetime import datetime
 from math import sqrt
+from best_values import best_value
 import matplotlib.pyplot as plt
 
 
 num_of_iter = 3
 compared_options = 3
+
+files_euclid = [
+        "eil51", "berlin52", "st70", "pr76", "rd100", "lin105", "ch130", "ch150", "tsp225", "a280", "pcb442", "pr1002",
+    ]
+pre_euclid = "data\euc_2d"
+post_euclid = ".tsp"
+
+def test_tsplib(files, pre, post):
+    pass
 
 # jeden test na wszystko, bo musimy miec optimal do prd
 # czas zmieniony na rustowy, ten pythonowy nie jest dokładny
