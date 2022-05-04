@@ -7,7 +7,7 @@ use std::collections::HashMap;
 #[pyfunction]
 #[allow(dead_code)]
 pub fn create_euclid(size: usize) -> PyResult<Matrix> {
-    let max_coor = size as i64;
+    let max_coor = 10 * size as i64;
     let mut coords = HashMap::new();
     let mut rng = rand::thread_rng();
 
@@ -36,7 +36,7 @@ pub fn create_euclid(size: usize) -> PyResult<Matrix> {
 #[pyfunction]
 #[allow(dead_code)]
 pub fn create_atsp(size: usize) -> PyResult<Matrix> {
-    let max_distance = size as u64;
+    let max_distance = 10 * size as u64;
     let mut matrix = Matrix::new(size);
     let mut rng = rand::thread_rng();
 
@@ -57,7 +57,7 @@ pub fn create_atsp(size: usize) -> PyResult<Matrix> {
 #[pyfunction]
 #[allow(dead_code)]
 pub fn create_tsp(size: usize) -> PyResult<Matrix> {
-    let max_distance = size as u64;
+    let max_distance = 10 * size as u64;
     let mut matrix = Matrix::new(size);
     let mut rng = rand::thread_rng();
 

@@ -1,0 +1,11 @@
+\begin{center}
+\begin{tabular}{|c|c|c|}
+\hline
+50 & 0.062103170000000006 & 0.00803844\\
+\hline
+100 & 0.16162263 & 0.06788555\\
+\hline
+150 & 0.27291606 & 0.21372222000000002\\
+\hline
+\end{tabular}
+\end{center}
