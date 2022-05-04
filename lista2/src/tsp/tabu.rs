@@ -45,7 +45,10 @@ fn tabu_search(
 
     let mut counter = 0;
 
-    while counter < n * 15 && last_change < n {
+    println!("THREAD: {:?}", global_minimum_perm);
+
+
+    while counter < n * 10 && last_change < n {
         counter += 1;
 
         let mut global_best_i = 0;
@@ -141,6 +144,10 @@ fn tabu_search(
             }
         }
 
+        if global_best_change == std::i64::MIN {
+            break;
+        }
+
 
         let mut perm = best_perm.write().unwrap();
         let mut value = best_value.write().unwrap();
@@ -188,6 +195,8 @@ fn tabu_search(
                 break;
             }
         }
+
+        println!("THREAD: {}: {}: {:?}", counter, global_best_change, best_perm);
     }
 
     let perm = best_perm.read().unwrap();
@@ -226,7 +235,9 @@ fn tabu_search_no_threads(
 
     let mut counter = 0;
 
-    while counter < n * 15 && last_change < n {
+    println!("NO_THREAD: {:?}", global_minimum_perm);
+
+    while counter < 10 * n && last_change < n {
         counter += 1;
 
         let mut global_best_i = 0;
@@ -275,6 +286,10 @@ fn tabu_search_no_threads(
             }
         }
 
+        if global_best_change == std::i64::MIN {
+            break;
+        }
+
         alg::reverse(&mut best_perm, global_best_i, global_best_j);
         best_value = (best_value as i64 - global_best_change) as u64;
 
@@ -316,6 +331,8 @@ fn tabu_search_no_threads(
                 break;
             }
         }
+
+        println!("NO_THREAD: {}: {}: {:?}", counter, global_best_change, best_perm);
     }
 
     let duration = start.elapsed().as_secs_f64();
