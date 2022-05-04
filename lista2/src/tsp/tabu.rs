@@ -45,7 +45,7 @@ fn tabu_search(
 
     let mut counter = 0;
 
-    println!("THREAD: {:?}", global_minimum_perm);
+    // println!("THREAD: {:?}", global_minimum_perm);
 
 
     while counter < n * 10 && last_change < n {
@@ -163,6 +163,10 @@ fn tabu_search(
             returned = 0;
         }
 
+        // if *value == 2707 {
+            // println!("{}", *global_minimum);
+        // }
+
         if global_minimum_tabu_list.len() < tabu_size {
             global_minimum_tabu_list.push_back((global_best_i, global_best_j));
         }
@@ -196,11 +200,11 @@ fn tabu_search(
             }
         }
 
-        println!("THREAD: {}: {}: {:?}", counter, global_best_change, best_perm);
+        // println!("THREAD: {}: {}: {:?}", counter, global_best_change, perm);
     }
 
-    let perm = best_perm.read().unwrap();
-    let value = best_value.read().unwrap();
+    let perm = global_minimum_perm;
+    let value = global_minimum_value.read().unwrap();
     let duration = start.elapsed().as_secs_f64();
 
     Ok((*value, perm.clone(), duration))
@@ -235,7 +239,7 @@ fn tabu_search_no_threads(
 
     let mut counter = 0;
 
-    println!("NO_THREAD: {:?}", global_minimum_perm);
+    // println!("NO-THREAD: {:?}", global_minimum_perm);
 
     while counter < 10 * n && last_change < n {
         counter += 1;
@@ -332,7 +336,7 @@ fn tabu_search_no_threads(
             }
         }
 
-        println!("NO_THREAD: {}: {}: {:?}", counter, global_best_change, best_perm);
+        // println!("NO-THREAD: {}: {}: {:?}", counter, global_best_change, best_perm);
     }
 
     let duration = start.elapsed().as_secs_f64();
