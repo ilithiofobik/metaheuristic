@@ -1,6 +1,5 @@
 from cgi import test
 from tsp_tabu import *
-from datetime import datetime
 from math import sqrt
 import best_values
 import matplotlib.pyplot as plt

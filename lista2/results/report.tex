@@ -1,0 +1,55 @@
+% uklad dokumentu
+	\documentclass{article}
+	\usepackage{xparse}
+	\usepackage[margin=1cm]{geometry}
+    \usepackage{enumerate} 
+	\frenchspacing
+    \linespread{1.2}
+    \setlength{\parindent}{0pt}
+
+% jezyk polski
+	\usepackage[polish]{babel}
+	\usepackage[utf8]{inputenc}
+	\usepackage{polski}
+ 
+% pakiety matematyczne
+    \let\lll\undefined
+	\usepackage{amssymb}
+    \usepackage{amsthm}
+	\usepackage{amsmath}
+	\usepackage{amsfonts}
+	\usepackage{tikz}
+
+% hiperlacza
+	\usepackage{hyperref}
+	\hypersetup{
+		colorlinks,
+		citecolor=black,
+		filecolor=black,
+		linkcolor=black,
+		urlcolor=black
+	}
+
+% wstawianie zdjec
+	\usepackage{graphicx} 
+	\pagenumbering{gobble}
+	
+
+% podstawowe informacje
+    \title{Algorytmy metaheurystyczne 2}
+    \author{P. Cegieła, W. Sęk}
+
+\begin{document} 
+
+\maketitle
+
+\section{Teoretyczna złożoność}
+Warunkiem wyjścia w naszym algorytmie było przekroczenie $15n$ iteracji, gdzie $n=|V|$ lub $n$ ruchów bez zmiany na lepsze rozwiązanie. Rozważmy najgorszy możliwy przypadek, gdzie wykonujemy $15n$ iteracji. Niech $k$ to długość listy tabu. Implementacja listy tabu za pomocą VecDeq pozwala na dostęp do $i$-tego elementu w czasie stałym, a usuwanie i dodawanie elementów w czasie liniowym.
+\\
+W każdym kroku algorytmu przeglądamy wszystkich $\frac{n(n-1)}{2}$ sąsiadów danego rozwiązania i dla każdego sprawdzamy z $O(k)$ czy jest na liście tabu. Sprawdzenie o ile sąsiad zmienia wartość permutacji jest stały (dla $invert$ liczymy wcześniej z $O(n^2)$ pomocnicze tablice. Niech $O(l)$ to złożoność przybliżenia początkowego (dla 
+2-$opt$ $O(n^3)$. Wybieramy najlepszego z nich. Ostatecznie mamy (dla $k$ stałego i  $2$-opta):
+$$O\left(15n\cdot \frac{n(n-1)}{2} \cdot k + l\right)=O(n^3)$$
+
+
+
+\end{document}
