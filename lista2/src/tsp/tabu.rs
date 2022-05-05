@@ -31,7 +31,7 @@ fn tabu_search(
     let tabu_list = Arc::new(RwLock::new(tabu_list));
     let best_perm = Arc::new(RwLock::new(best_perm));
 
-    let num_of_threads = num_cpus::get_physical();
+    let num_of_threads = 1;
     // let max_time = 10_000_000_000; //10s
     let mut last_change = 0;
     // let start = Instant::now();
@@ -46,6 +46,7 @@ fn tabu_search(
     let mut counter = 0;
 
     // println!("THREAD: {:?}", global_minimum_perm);
+
 
     while counter < n * 10 && last_change < n {
         counter += 1;
@@ -76,7 +77,7 @@ fn tabu_search(
                 let glo_min = global_minimum_value_clone.read().unwrap();
                 let glo_change = *value - *glo_min;
 
-                if !*swap_change_clone {
+                if *swap_change_clone {
                     let mut old_sums = vec![0; n];
                     let mut new_sums = vec![0; n];
                     // keeping sums of weights from 0 to i in order to calculate cost of path in constant time
@@ -109,7 +110,7 @@ fn tabu_search(
                         }
                     }
                 } else {
-                    for i in (t..n - 1).step_by(num_of_threads) {
+                    for i in (t..n - 1).rev().step_by(num_of_threads) {
                         for j in i + 1..n {
                             let new_change = alg::change_value_swap(&perm, &matrix_clone, i, j);
                             if new_change > best_change
@@ -147,6 +148,7 @@ fn tabu_search(
             break;
         }
 
+
         let mut perm = best_perm.write().unwrap();
         let mut value = best_value.write().unwrap();
         alg::reverse(&mut perm, global_best_i, global_best_j);
@@ -162,7 +164,7 @@ fn tabu_search(
         }
 
         // if *value == 2707 {
-        // println!("{}", *global_minimum);
+            // println!("{}", *global_minimum);
         // }
 
         if global_minimum_tabu_list.len() < tabu_size {
@@ -197,12 +199,15 @@ fn tabu_search(
                 break;
             }
         }
+
+        // println!("THREAD: {}: {}: {:?}", counter, global_best_change, perm);
     }
 
+    let perm = global_minimum_perm;
     let value = global_minimum_value.read().unwrap();
     let duration = start.elapsed().as_secs_f64();
 
-    Ok((*value, global_minimum_perm, duration))
+    Ok((*value, perm.clone(), duration))
 }
 
 #[allow(dead_code)]
@@ -244,7 +249,7 @@ fn tabu_search_no_threads(
         let mut global_best_change = std::i64::MIN;
         let glo_change = best_value - global_minimum_value;
 
-        if !swap_change {
+        if swap_change {
             let mut old_sums = vec![0; n];
             let mut new_sums = vec![0; n];
             // keeping sums of weights from 0 to i in order to calculate cost of path in constant time

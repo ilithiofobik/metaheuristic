@@ -51,6 +51,8 @@ def test_tsplib(files, pre, post, name):
         (val_no_threads, _, time_no_threads_a) = tabu_search_no_threads(m, n, True, best_value, best_perm)
         (val_invert, _, time_invert_a) = tabu_search(m, 13, False, best_value, best_perm)
 
+        print(val_13, val_sqrt, val_default, val_no_threads, val_invert, min_val)
+
         prd_13 = ((val_13 - min_val) / min_val) * 100.0
         prd_sqrt = ((val_sqrt - min_val) / min_val) * 100.0
         prd_default = ((val_default - min_val) / min_val) * 100.0
@@ -63,7 +65,7 @@ def test_tsplib(files, pre, post, name):
         time_no_threads = time_no_threads_a
         time_invert = time_invert_a
 
-        x.append(n) # easiest way to get n?
+        x.append(n)
 
         y_prd_13.append(prd_13)
         y_prd_sqrt.append(prd_sqrt)
@@ -88,7 +90,7 @@ def test_tsplib(files, pre, post, name):
     plt.plot(x, y_prd_sqrt, label='sqrt(n) elements')
     plt.plot(x, y_prd_default, label='n elements')
     plt.legend()
-    plt.savefig('results/plots/tabu_' + name.lower() + '_time.png')
+    plt.savefig('results/plots/tabu_' + name.lower() + '_prd.png')
 
     plt.clf()
     plt.xlabel('n')
@@ -98,7 +100,7 @@ def test_tsplib(files, pre, post, name):
     plt.plot(x, y_time_sqrt, label='sqrt(n) elements')
     plt.plot(x, y_time_default, label='n elements')
     plt.legend()
-    plt.savefig('results/plots/tabu_' + name.lower() + '_prd.png')
+    plt.savefig('results/plots/tabu_' + name.lower() + '_time.png')
 
     plt.clf()
     plt.xlabel('n')
@@ -107,7 +109,7 @@ def test_tsplib(files, pre, post, name):
     plt.plot(x, y_prd_default, label='multiple threads')
     plt.plot(x, y_prd_no_threads, label='single thread')
     plt.legend()
-    plt.savefig('results/plots/multithreading_' + name.lower() + '_time.png')
+    plt.savefig('results/plots/multithreading_' + name.lower() + '_prd.png')
 
     plt.clf()
     plt.xlabel('n')
@@ -116,7 +118,7 @@ def test_tsplib(files, pre, post, name):
     plt.plot(x, y_time_default, label='multiple threads')
     plt.plot(x, y_time_no_threads, label='single thread')
     plt.legend()
-    plt.savefig('results/plots/multithreading_' + name.lower() + '_prd.png')
+    plt.savefig('results/plots/multithreading_' + name.lower() + '_time.png')
 
     plt.clf()
     plt.xlabel('n')
@@ -125,7 +127,7 @@ def test_tsplib(files, pre, post, name):
     plt.plot(x, y_prd_default, label='swap')
     plt.plot(x, y_prd_invert, label='invert')
     plt.legend()
-    plt.savefig('results/plots/neighbours_' + name.lower() + '_time.png')
+    plt.savefig('results/plots/neighbours_' + name.lower() + '_prd.png')
 
     plt.clf()
     plt.xlabel('n')
@@ -134,7 +136,7 @@ def test_tsplib(files, pre, post, name):
     plt.plot(x, y_time_default, label='swap')
     plt.plot(x, y_time_invert, label='invert')
     plt.legend()
-    plt.savefig('results/plots/neighbours_' + name.lower() + '_prd.png')
+    plt.savefig('results/plots/neighbours_' + name.lower() + '_time.png')
 
     # Latex tables
 
@@ -265,7 +267,7 @@ def test_tabu(gen, name):
         y_time_invert.append(time_invert / num_of_iter)
 
     
-    # Plots
+      # Plots
 
     plt.clf()
     plt.xlabel('n')
@@ -275,7 +277,7 @@ def test_tabu(gen, name):
     plt.plot(x, y_prd_sqrt, label='sqrt(n) elements')
     plt.plot(x, y_prd_default, label='n elements')
     plt.legend()
-    plt.savefig('results/plots/tabu_' + name.lower() + '_time.png')
+    plt.savefig('results/plots/tabu_' + name.lower() + '_prd.png')
 
     plt.clf()
     plt.xlabel('n')
@@ -285,7 +287,7 @@ def test_tabu(gen, name):
     plt.plot(x, y_time_sqrt, label='sqrt(n) elements')
     plt.plot(x, y_time_default, label='n elements')
     plt.legend()
-    plt.savefig('results/plots/tabu_' + name.lower() + '_prd.png')
+    plt.savefig('results/plots/tabu_' + name.lower() + '_time.png')
 
     plt.clf()
     plt.xlabel('n')
@@ -294,7 +296,7 @@ def test_tabu(gen, name):
     plt.plot(x, y_prd_default, label='multiple threads')
     plt.plot(x, y_prd_no_threads, label='single thread')
     plt.legend()
-    plt.savefig('results/plots/multithreading_' + name.lower() + '_time.png')
+    plt.savefig('results/plots/multithreading_' + name.lower() + '_prd.png')
 
     plt.clf()
     plt.xlabel('n')
@@ -303,7 +305,7 @@ def test_tabu(gen, name):
     plt.plot(x, y_time_default, label='multiple threads')
     plt.plot(x, y_time_no_threads, label='single thread')
     plt.legend()
-    plt.savefig('results/plots/multithreading_' + name.lower() + '_prd.png')
+    plt.savefig('results/plots/multithreading_' + name.lower() + '_time.png')
 
     plt.clf()
     plt.xlabel('n')
@@ -312,7 +314,7 @@ def test_tabu(gen, name):
     plt.plot(x, y_prd_default, label='swap')
     plt.plot(x, y_prd_invert, label='invert')
     plt.legend()
-    plt.savefig('results/plots/neighbours_' + name.lower() + '_time.png')
+    plt.savefig('results/plots/neighbours_' + name.lower() + '_prd.png')
 
     plt.clf()
     plt.xlabel('n')
@@ -321,7 +323,7 @@ def test_tabu(gen, name):
     plt.plot(x, y_time_default, label='swap')
     plt.plot(x, y_time_invert, label='invert')
     plt.legend()
-    plt.savefig('results/plots/neighbours_' + name.lower() + '_prd.png')
+    plt.savefig('results/plots/neighbours_' + name.lower() + '_time.png')
 
     # Latex tables
 
@@ -383,8 +385,8 @@ def test_tabu(gen, name):
         f.write(text)
 
 
-#test_tsplib(files_euclid, pre_euclid, post_euclid, name_euclid)
-#test_tsplib(files_asym, pre_asym, post_asym, name_asym)
-test_tabu(create_euclid, 'Euclid')
-test_tabu(create_tsp, 'Symmetric')
-test_tabu(create_atsp, 'Asymmetric')
+test_tsplib(files_euclid, pre_euclid, post_euclid, name_euclid)
+test_tsplib(files_asym, pre_asym, post_asym, name_asym)
+#test_tabu(create_euclid, 'Euclid')
+#test_tabu(create_tsp, 'Symmetric')
+#test_tabu(create_atsp, 'Asymmetric')
