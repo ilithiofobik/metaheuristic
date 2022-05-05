@@ -37,7 +37,7 @@
 
 % podstawowe informacje
     \title{Algorytmy metaheurystyczne 2}
-    \author{P. Cegieła, W. Sęk}
+    \author{Paweł Cegieła, Wojciech Sęk}
 
 \begin{document} 
 
@@ -51,5 +51,349 @@ W każdym kroku algorytmu przeglądamy wszystkich $\frac{n(n-1)}{2}$ sąsiadów 
 $$O\left(15n\cdot \frac{n(n-1)}{2} \cdot k + l\right)=O(n^3)$$
 
 
+\section{Porównanie Tabu Search z 2-OPT}
+
+\subsection{Dane z TSPLIB}
+
+\subsubsection{Grafy asymetryczne}
+\begin{center}
+\includegraphics[width=\textwidth, 
+                   height = 0.4\textheight, 
+                   keepaspectratio]
+                  {plots/two_opt_tsplib_asym_prd} 
+\end{center}
+
+
+\subsubsection{Grafy euklidesowe}
+
+\begin{center}
+\includegraphics[width=\textwidth, 
+                   height = 0.4\textheight, 
+                   keepaspectratio]
+                  {plots/two_opt_tsplib_euclid_prd} 
+\end{center}
+
+
+\subsection{Dane generowane przez nas}
+
+
+\subsubsection{Grafy symetryczne}
+
+\begin{center}
+\includegraphics[width=\textwidth, 
+                   height = 0.4\textheight, 
+                   keepaspectratio]
+                  {plots/two_opt_symmetric_prd} 
+\end{center}
+
+\subsubsection{Grafy asymetryczne}
+
+\begin{center}
+\includegraphics[width=\textwidth, 
+                   height = 0.4\textheight, 
+                   keepaspectratio]
+                  {plots/two_opt_asymmetric_prd} 
+\end{center}
+
+
+\subsubsection{Grafy euklidesowe}
+
+\begin{center}
+\includegraphics[width=\textwidth, 
+                   height = 0.4\textheight, 
+                   keepaspectratio]
+                  {plots/two_opt_euclid_prd} 
+\end{center}
+
+
+\subsection{Obserwacje}
+
+\subsection{Tabele}
+
+
+
+\section{Porównanie różnych długości listy tabu}
+
+\subsection{Dane z TSPLIB}
+
+\subsubsection{Grafy asymetryczne}
+
+\begin{center}
+\includegraphics[width=\textwidth, 
+                   height = 0.4\textheight, 
+                   keepaspectratio]
+                  {plots/tabu_tsplib_asym_prd} 
+\end{center}
+
+\begin{center}
+\includegraphics[width=\textwidth, 
+                   height = 0.4\textheight, 
+                   keepaspectratio]
+                  {plots/tabu_tsplib_asym_time} 
+\end{center}
+
+\subsubsection{Grafy euklidesowe}
+
+\begin{center}
+\includegraphics[width=\textwidth, 
+                   height = 0.4\textheight, 
+                   keepaspectratio]
+                  {plots/tabu_tsplib_euclid_prd} 
+\end{center}
+
+\begin{center}
+\includegraphics[width=\textwidth, 
+                   height = 0.4\textheight, 
+                   keepaspectratio]
+                  {plots/tabu_tsplib_euclid_time} 
+\end{center}
+
+
+\subsection{Dane generowane przez nas}
+
+
+\subsubsection{Grafy symetryczne}
+
+\begin{center}
+\includegraphics[width=\textwidth, 
+                   height = 0.4\textheight, 
+                   keepaspectratio]
+                  {plots/tabu_symmetric_prd} 
+\end{center}
+
+\begin{center}
+\includegraphics[width=\textwidth, 
+                   height = 0.4\textheight, 
+                   keepaspectratio]
+                  {plots/tabu_symmetric_time} 
+\end{center}
+
+\subsubsection{Grafy asymetryczne}
+
+\begin{center}
+\includegraphics[width=\textwidth, 
+                   height = 0.4\textheight, 
+                   keepaspectratio]
+                  {plots/tabu_asymmetric_prd} 
+\end{center}
+
+\begin{center}
+\includegraphics[width=\textwidth, 
+                   height = 0.4\textheight, 
+                   keepaspectratio]
+                  {plots/tabu_asymmetric_time} 
+\end{center}
+
+\subsubsection{Grafy euklidesowe}
+
+\begin{center}
+\includegraphics[width=\textwidth, 
+                   height = 0.4\textheight, 
+                   keepaspectratio]
+                  {plots/tabu_euclid_prd} 
+\end{center}
+
+\begin{center}
+\includegraphics[width=\textwidth, 
+                   height = 0.4\textheight, 
+                   keepaspectratio]
+                  {plots/tabu_euclid_time} 
+\end{center}
+
+\subsection{Obserwacje}
+
+\subsection{Tabele}
+
+
+
+\section{Porównanie sąsiedztwa insert i swap}
+
+\subsection{Dane z TSPLIB}
+
+\subsubsection{Grafy asymetryczne}
+
+\begin{center}
+\includegraphics[width=\textwidth, 
+                   height = 0.4\textheight, 
+                   keepaspectratio]
+                  {plots/neighbours_tsplib_asym_prd} 
+\end{center}
+
+\begin{center}
+\includegraphics[width=\textwidth, 
+                   height = 0.4\textheight, 
+                   keepaspectratio]
+                  {plots/neighbours_tsplib_asym_time} 
+\end{center}
+
+\subsubsection{Grafy euklidesowe}
+
+\begin{center}
+\includegraphics[width=\textwidth, 
+                   height = 0.4\textheight, 
+                   keepaspectratio]
+                  {plots/neighbours_tsplib_euclid_prd} 
+\end{center}
+
+\begin{center}
+\includegraphics[width=\textwidth, 
+                   height = 0.4\textheight, 
+                   keepaspectratio]
+                  {plots/neighbours_tsplib_euclid_time} 
+\end{center}
+
+
+\subsection{Dane generowane przez nas}
+
+
+\subsubsection{Grafy symetryczne}
+
+\begin{center}
+\includegraphics[width=\textwidth, 
+                   height = 0.4\textheight, 
+                   keepaspectratio]
+                  {plots/neighbours_symmetric_prd} 
+\end{center}
+
+\begin{center}
+\includegraphics[width=\textwidth, 
+                   height = 0.4\textheight, 
+                   keepaspectratio]
+                  {plots/neighbours_symmetric_time} 
+\end{center}
+
+\subsubsection{Grafy asymetryczne}
+
+\begin{center}
+\includegraphics[width=\textwidth, 
+                   height = 0.4\textheight, 
+                   keepaspectratio]
+                  {plots/neighbours_asymmetric_prd} 
+\end{center}
+
+\begin{center}
+\includegraphics[width=\textwidth, 
+                   height = 0.4\textheight, 
+                   keepaspectratio]
+                  {plots/neighbours_asymmetric_time} 
+\end{center}
+
+\subsubsection{Grafy euklidesowe}
+
+\begin{center}
+\includegraphics[width=\textwidth, 
+                   height = 0.4\textheight, 
+                   keepaspectratio]
+                  {plots/neighbours_euclid_prd} 
+\end{center}
+
+\begin{center}
+\includegraphics[width=\textwidth, 
+                   height = 0.4\textheight, 
+                   keepaspectratio]
+                  {plots/neighbours_euclid_time} 
+\end{center}
+
+\subsection{Obserwacje}
+
+\subsection{Tabele}
+
+
+
+\section{Porównanie wersji wielowątkowej i wersji jednowątkowej}
+
+\subsection{Dane z TSPLIB}
+
+\subsubsection{Grafy asymetryczne}
+
+\begin{center}
+\includegraphics[width=\textwidth, 
+                   height = 0.4\textheight, 
+                   keepaspectratio]
+                  {plots/multithreading_tsplib_asym_prd} 
+\end{center}
+
+\begin{center}
+\includegraphics[width=\textwidth, 
+                   height = 0.4\textheight, 
+                   keepaspectratio]
+                  {plots/multithreading_tsplib_asym_time} 
+\end{center}
+
+\subsubsection{Grafy euklidesowe}
+
+\begin{center}
+\includegraphics[width=\textwidth, 
+                   height = 0.4\textheight, 
+                   keepaspectratio]
+                  {plots/multithreading_tsplib_euclid_prd} 
+\end{center}
+
+\begin{center}
+\includegraphics[width=\textwidth, 
+                   height = 0.4\textheight, 
+                   keepaspectratio]
+                  {plots/multithreading_tsplib_euclid_time} 
+\end{center}
+
+
+\subsection{Dane generowane przez nas}
+
+
+\subsubsection{Grafy symetryczne}
+
+\begin{center}
+\includegraphics[width=\textwidth, 
+                   height = 0.4\textheight, 
+                   keepaspectratio]
+                  {plots/multithreading_symmetric_prd} 
+\end{center}
+
+\begin{center}
+\includegraphics[width=\textwidth, 
+                   height = 0.4\textheight, 
+                   keepaspectratio]
+                  {plots/multithreading_symmetric_time} 
+\end{center}
+
+\subsubsection{Grafy asymetryczne}
+
+\begin{center}
+\includegraphics[width=\textwidth, 
+                   height = 0.4\textheight, 
+                   keepaspectratio]
+                  {plots/multithreading_asymmetric_prd} 
+\end{center}
+
+\begin{center}
+\includegraphics[width=\textwidth, 
+                   height = 0.4\textheight, 
+                   keepaspectratio]
+                  {plots/multithreading_asymmetric_time} 
+\end{center}
+
+\subsubsection{Grafy euklidesowe}
+
+\begin{center}
+\includegraphics[width=\textwidth, 
+                   height = 0.4\textheight, 
+                   keepaspectratio]
+                  {plots/multithreading_euclid_prd} 
+\end{center}
+
+\begin{center}
+\includegraphics[width=\textwidth, 
+                   height = 0.4\textheight, 
+                   keepaspectratio]
+                  {plots/multithreading_euclid_time} 
+\end{center}
+
+\subsection{Obserwacje}
+
+\subsection{Tabele}
+
+
+
+\section{Wnioski}
 
 \end{document}
