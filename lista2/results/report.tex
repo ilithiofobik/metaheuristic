@@ -1451,5 +1451,11 @@ $$O\left(15n\cdot \frac{n(n-1)}{2} \cdot k + l\right)=O(n^3)$$
 
 
 \section{Wnioski}
+\begin{itemize}
+\item Algorytm przeszukiwania z zabronieniami zawsze podaje co najmniej tak samo dobry wynik jak $2-OPT$, ponieważ przyjmuje jego wynik za przybliżenie początkowe. Oba algorytmy działają najlepiej dla grafów euklidesowych, a największe polepszenie wyniku jest dla grafów asymetrycznych. Jest tak dlatego, że w grafach asymetrycznych łatwo znaleźć lokalne minimum, które jest dalekie od globalnego, natomiast grafy euklidesowe mają lokalne minima bliskie globalnemu.
+\item Dla różnych długości listy zabronień ($13, \sqrt{n}, n$) znalezione najkrótsze ścieżki we wszystkich rodzinach grafów są identyczne lub bardzo bliskie sobie. Natomiast czas działania algorytmu rośnie dla większych długości, bo przeglądanie listy zabronień jest dłuższe. Dla grafów do $n=500$ wartość $13$ zapewnia najlepszy czas działania i bardzo dobre wyniki.
+\item W grafach euklidesowych i symetrycznych sąsiedztwo $invert$ znajduje lepsze rozwiązania w krótszym czasie (warunek wyjścia to nieznalezienie lepszego rozwiązania przez $n$ ruchów). Natomiast w grafach asymetrycznych sąsiedztwo $swap$ daje lepsze wyniki - w grafach asymetrycznych $invert$ może często przedłużyć znalezioną ścieżkę.
+\item Wersja jednowątkowa i wielowątkowa dają niemal identyczne wyniki - różnice wynikają z tego, że wątki mogą kończyć w różnym czasie swoje działania i dlatego wynik jest inny niż w jednym wątku. Dla małych grafów komunikacja między wątkami jest droga i pogarsza czas działania, natomiast dla większych grafów ($n\geq 200$) czas działania algorytmu współbieżnego jest prawie dwukrotnie większy, ponieważ koszta przesyłania danych między wątkami są nadrabiane przez równoległe obliczenia.  
+\end{itemize}
 
 \end{document}
