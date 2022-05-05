@@ -1,8 +1,8 @@
 extern crate rand;
 
 use super::geo::Matrix;
-use rand::seq::SliceRandom;
 use pyo3::prelude::*;
+use rand::seq::SliceRandom;
 
 pub fn objective_function(permutation: &[usize], matrix: &Matrix) -> u64 {
     let n = matrix.n;
@@ -102,6 +102,14 @@ pub fn reverse(perm: &mut [usize], x: usize, y: usize) {
         i += 1;
         j -= 1;
     }
+}
+
+pub fn swap(perm: &mut [usize], x: usize, y: usize) {
+    let i = x;
+    let j = y;
+    let temp = perm[i];
+    perm[i] = perm[j];
+    perm[j] = temp;
 }
 
 pub fn change_value_invert(
