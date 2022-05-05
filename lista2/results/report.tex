@@ -108,6 +108,10 @@ $$O\left(15n\cdot \frac{n(n-1)}{2} \cdot k + l\right)=O(n^3)$$
 
 \subsection{Obserwacje}
 
+Dla każdego typu grafów Tabu Search zwraca przynajmniej tak samo dobre, a najczęściej lepsze wyniki od 2-OPT, na którym bazuje.
+
+W przypadku grafów asymetrycznych, różnica w PRD pomiędzy Tabu Search a 2-OPT jest największa. Grafy euklidesowe są w dalszym ciągu przeszukiwane lepiej przez Tabu Search, ale różnica jest już minimalna. Dla grafów symetrycznych wyniki pokrywały się.
+
 
 \subsection{Tabele}
 
@@ -353,6 +357,10 @@ $$O\left(15n\cdot \frac{n(n-1)}{2} \cdot k + l\right)=O(n^3)$$
 \end{center}
 
 \subsection{Obserwacje}
+
+W przypadku grafów asymetrycznych z TSPLIB, najlepiej radził sobie algorytm z najdłuższą listą tabu - n-elementową (natomiast dla grafów generowanych, rezultaty dla wszystkich długości były takie same lub minimalnie lepsze dla 13 el.). Na grafach euklidesowych wyniki były zbliżone. Dla grafów symetrycznych nie było różnicy w wyborze długości listy tabu.
+
+Jeśli chodzi o czas, dla każdego z przypadków najdłużej trwało przejście algorytmu dla najdłuższej listy tabu. W przypadku generowanych przez nas grafów symetrycznych i asymetrycznych, zbliżone czasy trwania miał algorytm z tabu o długości $\sqrt{n}$
 
 \subsection{Tabele}
 
@@ -748,6 +756,12 @@ $$O\left(15n\cdot \frac{n(n-1)}{2} \cdot k + l\right)=O(n^3)$$
 \end{center}
 
 \subsection{Obserwacje}
+
+Dla grafów asymetrycznych, lepszym wyborem jest sąsiedztwo swap - jest ono wyraźnie lepsze pod kątem jakości rozwiązania, natomiast wykonuje się dłużej.
+
+Dla grafów symetrycznych rozwiązania uzyskane z użyciem otoczenia invert okazały się lepsze zarówno pod kątem jakości, jak i czasu.
+
+W przypadku grafów euklidesowych, dla danych z TSPLIB oba sąsiedztwa dawały zbliżone wyniki, a dla danych generowanych przez nas lepsze było najczęściej sąsiedztwo invert (lecz dla większych $n$ nie była to wielka przewaga. Czasowo, tak jak w poprzednich grupach, zwycięzcą okazał się invert.
 
 \subsection{Tabele}
 
@@ -1145,6 +1159,8 @@ $$O\left(15n\cdot \frac{n(n-1)}{2} \cdot k + l\right)=O(n^3)$$
 
 \subsection{Obserwacje}
 
+PRD dla wersji jedno- oraz wielowątkowej było bardzo zbliżone, albo dokładnie takie samo. Czasowo dla najmniejszych grafów minimalnie wygrywała wersja bez współbieżności, natomiast dla większych macierzy zdecydowanie lepsza była wersja z wątkami.
+
 \subsection{Tabele}
 
 \begin{center}
@@ -1455,7 +1471,7 @@ $$O\left(15n\cdot \frac{n(n-1)}{2} \cdot k + l\right)=O(n^3)$$
 \item Algorytm przeszukiwania z zabronieniami zawsze podaje co najmniej tak samo dobry wynik jak $2-OPT$, ponieważ przyjmuje jego wynik za przybliżenie początkowe. Oba algorytmy działają najlepiej dla grafów euklidesowych, a największe polepszenie wyniku jest dla grafów asymetrycznych. Jest tak dlatego, że w grafach asymetrycznych łatwo znaleźć lokalne minimum, które jest dalekie od globalnego, natomiast grafy euklidesowe mają lokalne minima bliskie globalnemu.
 \item Dla różnych długości listy zabronień ($13, \sqrt{n}, n$) znalezione najkrótsze ścieżki we wszystkich rodzinach grafów są identyczne lub bardzo bliskie sobie. Natomiast czas działania algorytmu rośnie dla większych długości, bo przeglądanie listy zabronień jest dłuższe. Dla grafów do $n=500$ wartość $13$ zapewnia najlepszy czas działania i bardzo dobre wyniki.
 \item W grafach euklidesowych i symetrycznych sąsiedztwo $invert$ znajduje lepsze rozwiązania w krótszym czasie (warunek wyjścia to nieznalezienie lepszego rozwiązania przez $n$ ruchów). Natomiast w grafach asymetrycznych sąsiedztwo $swap$ daje lepsze wyniki - w grafach asymetrycznych $invert$ może często przedłużyć znalezioną ścieżkę.
-\item Wersja jednowątkowa i wielowątkowa dają niemal identyczne wyniki - różnice wynikają z tego, że wątki mogą kończyć w różnym czasie swoje działania i dlatego wynik jest inny niż w jednym wątku. Dla małych grafów komunikacja między wątkami jest droga i pogarsza czas działania, natomiast dla większych grafów ($n\geq 200$) czas działania algorytmu współbieżnego jest prawie dwukrotnie większy, ponieważ koszta przesyłania danych między wątkami są nadrabiane przez równoległe obliczenia.  
+\item Wersja jednowątkowa i wielowątkowa dają niemal identyczne wyniki - różnice wynikają z tego, że wątki mogą kończyć w różnym czasie swoje działania i dlatego wynik jest inny niż w jednym wątku. Dla małych grafów komunikacja między wątkami jest droga i pogarsza czas działania, natomiast dla większych grafów ($n\geq 200$) czas działania algorytmu współbieżnego jest prawie dwukrotnie mniejszy, ponieważ koszta przesyłania danych między wątkami są nadrabiane przez równoległe obliczenia.  
 \end{itemize}
 
 \end{document}
