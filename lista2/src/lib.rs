@@ -17,6 +17,7 @@ fn tsp_tabu(_py: Python, m: &PyModule) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(create_euclid, m)?)?;
     m.add_function(wrap_pyfunction!(create_atsp, m)?)?;
     m.add_function(wrap_pyfunction!(create_tsp, m)?)?;
+    m.add_function(wrap_pyfunction!(create_tsp, m)?)?;
     m.add_class::<Matrix>()?;
     Ok(())
 }
