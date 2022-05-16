@@ -211,7 +211,7 @@ fn tabu_search(
     let value = global_minimum_value.read().unwrap();
     let duration = start.elapsed().as_secs_f64();
 
-    Ok((*value, perm.clone(), duration))
+    Ok((*value, perm, duration))
 }
 
 #[allow(dead_code)]

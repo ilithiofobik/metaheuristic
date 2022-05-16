@@ -2,6 +2,7 @@ extern crate rand;
 
 use super::alg;
 use super::alg::objective_function;
+use super::alg::reverse;
 use super::alg::two_opt;
 use super::geo::Matrix;
 use pyo3::prelude::*;
@@ -125,6 +126,7 @@ fn partially_mapped_crossing(father: &[usize], mother: &[usize]) -> (Vec<usize>,
 }
 
 #[allow(dead_code)]
+#[allow(clippy::too_many_arguments)]
 #[pyfunction]
 fn population_alg_no_threads_no_isles(
     matrix: &mut Matrix,       // matrix representing the graph
@@ -132,15 +134,14 @@ fn population_alg_no_threads_no_isles(
     gen_size: usize,           // size of one generation
     elite_num: usize,          // how many people are in elite (in the whole generation)
     cross_op: usize,           // 0 - HX, 1 - OX, 2 - PMX,
-    _swap_change: bool,         // swap or inverse in a mutation,
+    swap_change: bool,         // swap or inverse in a mutation,
     size_of_tournament: usize, // IMPORTANT: if set to 0, then use roulette rule
-    _mut_chance: f64,           // chance to get mutated,
+    mut_chance: f64,           // chance to get mutated,
     max_time: f64,             // max time to stop algorithm,
-) -> PyResult<(u64, Vec<usize>, f64)> {
+) -> PyResult<(u64, Vec<usize>)> {
     // swap_change - true if swap, false if invert, no other options
     // if tabu_size == 0, then tabu_size = n
     let start = Instant::now();
-    let vector: Vec<usize> = vec![0];
 
     // INITIALIZATION PHASE
     let n = matrix.n;
@@ -176,9 +177,9 @@ fn population_alg_no_threads_no_isles(
     while start.elapsed().as_secs_f64() < max_time {
         // EVALUATION
         let mut ppbs = Vec::with_capacity(gen_size);
-        for perm in &population {
+        for (i, perm) in population.iter().enumerate() {
             // can be also used in tournament but mainly used in roullete
-            ppbs.push(1.0 / (objective_function(perm, matrix) as f64));
+            ppbs.push((1.0 / (objective_function(perm, matrix) as f64), i));
         }
 
         // SELECTION
@@ -186,29 +187,48 @@ fn population_alg_no_threads_no_isles(
         let mut parents = Vec::with_capacity(num_of_parents);
         // use roulette
         if size_of_tournament == 0 {
-            let ppbs_sum: f64 = ppbs.iter().sum();
-            for _ in 0..num_of_parents {
-                let rand_parent = rand_thread.gen_range(0.0..ppbs_sum);
-                let mut index = 0;
-                let mut ppbs_subsum = ppbs[0];
-                while ppbs_subsum < rand_parent {
-                    index += 1;
-                    ppbs_subsum += ppbs[index];
+            let ppbs_sum: f64 = ppbs.iter().map(|(a, _)| a).sum();
+            for _ in 0..num_of_parents / 2 {
+                let rand_parent1 = rand_thread.gen_range(0.0..ppbs_sum);
+                let mut index1 = 0;
+                let mut ppbs_subsum = ppbs[0].0;
+                while ppbs_subsum < rand_parent1 {
+                    index1 += 1;
+                    ppbs_subsum += ppbs[index1].0;
                 }
-                parents.push(population[index].clone());
-            }
-        } else {
-            for _ in 0..num_of_parents {
-                let mut best_parent = 0;
-                let mut best_value = 0.0; // because we are considering 1/x
-                for _ in 0..size_of_tournament {
-                    let rand_parent = rand_thread.gen_range(0..gen_size);
-                    if ppbs[rand_parent] > best_value {
-                        best_value = ppbs[rand_parent];
-                        best_parent = rand_parent;
+                let mut index2 = index1;
+                while index1 == index2 {
+                    let rand_parent2 = rand_thread.gen_range(0.0..ppbs_sum);
+                    index2 = 0;
+                    let mut ppbs_subsum = ppbs[0].0;
+                    while ppbs_subsum < rand_parent2 {
+                        index2 += 1;
+                        ppbs_subsum += ppbs[index2].0;
                     }
                 }
-                parents.push(population[best_parent].clone());
+                parents.push(population[index1].clone());
+                parents.push(population[index2].clone());
+            }
+        } else {
+            for _ in 0..num_of_parents / 2 {
+                let mut best_parent1 = 0;
+                let mut best_parent2 = 0;
+                let mut best_value1 = 0.0; // because we are considering 1/x
+                let mut best_value2 = 0.0; // two best in tournament are parents
+                for _ in 0..size_of_tournament {
+                    let rand_parent = rand_thread.gen_range(0..gen_size);
+                    if ppbs[rand_parent].0 > best_value1 {
+                        best_value2 = best_value1;
+                        best_parent2 = best_parent1;
+                        best_value1 = ppbs[rand_parent].0;
+                        best_parent1 = rand_parent;
+                    } else if ppbs[rand_parent].0 > best_value2 {
+                        best_value2 = ppbs[rand_parent].0;
+                        best_parent2 = rand_parent;
+                    }
+                }
+                parents.push(population[best_parent1].clone());
+                parents.push(population[best_parent2].clone());
             }
         }
 
@@ -234,7 +254,40 @@ fn population_alg_no_threads_no_isles(
                 children.push(child2);
             }
         }
+
+        // ELITARISM
+        ppbs.sort_by(|(a1, _), (b1, _)| b1.partial_cmp(a1).unwrap());
+        for i in 0..elite_num {
+            children.push(population[ppbs[i].1].clone());
+        }
+
+        // MUTATION
+        population = children;
+        for k in 0..population.len() {
+            let do_mutate = rand_thread.gen_range(0.0..1.0);
+            if do_mutate < mut_chance {
+                let i = rand_thread.gen_range(0..population.len());
+                let j = rand_thread.gen_range(1..population.len());
+                let j = (i + j) % population.len();
+                if swap_change {
+                    population[k].swap(i, j);
+                } else {
+                    reverse(&mut population[k], i, j);
+                }
+            }
+        }
     }
 
-    Ok((0, vector, 1.0))
+    let mut best_value = std::u64::MAX;
+    let mut best_perm_idx = 0;
+
+    for (i, perm) in population.iter().enumerate() {
+        let new_value = objective_function(perm, matrix);
+        if new_value < best_value {
+            best_perm_idx = i;
+            best_value = new_value;
+        }
+    }
+
+    Ok((best_value, population[best_perm_idx].clone()))
 }
