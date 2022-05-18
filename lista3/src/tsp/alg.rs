@@ -103,12 +103,6 @@ pub fn reverse(perm: &mut [usize], x: usize, y: usize) {
     }
 }
 
-pub fn swap(perm: &mut [usize], x: usize, y: usize) {
-    let i = x;
-    let j = y;
-    perm.swap(i, j);
-}
-
 pub fn change_value_invert(
     perm: &[usize],
     matrix: &Matrix,
@@ -140,51 +134,6 @@ pub fn change_value_invert(
 
     old_val = old_val + old_sums[last] as i64 - old_sums[first] as i64;
     new_val = new_val + new_sums[first] as i64 - new_sums[last] as i64;
-
-    old_val - new_val
-}
-
-pub fn change_value_swap(perm: &[usize], matrix: &Matrix, first: usize, last: usize) -> i64 {
-    let n = matrix.n;
-
-    let prev_first = (first + n - 1) % n;
-    let succ_first = (first + 1) % n;
-    let prev_last = (last + n - 1) % n;
-    let succ_last = (last + 1) % n;
-
-    let old_val = {
-        if succ_first == last {
-            matrix.get(perm[prev_first], perm[first])
-                + matrix.get(perm[first], perm[last])
-                + matrix.get(perm[last], perm[succ_last])
-        } else if succ_last == first {
-            matrix.get(perm[prev_last], perm[last])
-                + matrix.get(perm[last], perm[first])
-                + matrix.get(perm[first], perm[succ_first])
-        } else {
-            matrix.get(perm[prev_first], perm[first])
-                + matrix.get(perm[first], perm[succ_first])
-                + matrix.get(perm[prev_last], perm[last])
-                + matrix.get(perm[last], perm[succ_last])
-        }
-    } as i64;
-
-    let new_val = {
-        if succ_first == last {
-            matrix.get(perm[prev_first], perm[last])
-                + matrix.get(perm[last], perm[first])
-                + matrix.get(perm[first], perm[succ_last])
-        } else if succ_last == first {
-            matrix.get(perm[prev_last], perm[first])
-                + matrix.get(perm[first], perm[last])
-                + matrix.get(perm[last], perm[succ_first])
-        } else {
-            matrix.get(perm[prev_first], perm[last])
-                + matrix.get(perm[last], perm[succ_first])
-                + matrix.get(perm[prev_last], perm[first])
-                + matrix.get(perm[first], perm[succ_last])
-        }
-    } as i64;
 
     old_val - new_val
 }
