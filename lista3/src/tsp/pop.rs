@@ -9,6 +9,10 @@ use pyo3::prelude::*;
 use rand::seq::SliceRandom;
 use rand::Rng;
 use std::collections::HashMap;
+use std::sync::mpsc;
+use std::sync::Arc;
+use std::sync::RwLock;
+use std::thread;
 use std::time::Instant;
 
 fn half_crossing(father: &[usize], mother: &[usize]) -> (Vec<usize>, Vec<usize>) {
@@ -530,6 +534,283 @@ fn population_alg_no_threads_isles(
 
     if best_perm_idx.0 != std::usize::MAX {
         best_perm = isles[best_perm_idx.0][best_perm_idx.1].clone(); // value changed in loop
+    }
+
+    Ok((best_value, best_perm))
+}
+
+#[allow(dead_code)]
+#[allow(clippy::too_many_arguments)]
+#[pyfunction]
+fn population_alg_threads_no_isles(
+    base_matrix: &Matrix,      // matrix representing the graph
+    gen_rand: bool,            // if false, use other metaheuristics
+    gen_size: usize,           // size of one generation
+    elite_num: usize,          // how many people are in elite (in the whole generation)
+    cross_op: usize,           // 0 - HX, 1 - OX, >1 - PMX,
+    swap_change: bool,         // swap or inverse in a mutation,
+    size_of_tournament: usize, // IMPORTANT: if set to 0, then use roulette rule
+    mut_chance: f64,           // chance to get mutated,
+    max_time: f64,             // max time to stop algorithm,
+    num_of_threads: usize,     // number of threads
+) -> PyResult<(u64, Vec<usize>)> {
+    // swap_change - true if swap, false if invert, no other options
+    // if tabu_size == 0, then tabu_size = n
+    let start = Instant::now();
+
+    // INITIALIZATION PHASE
+    //println!("INITIALIZATION");
+    let n = base_matrix.n; // base matrix left for the sake of main thread
+    let mut population = Vec::with_capacity(gen_size); // that is faster
+    let matrix = Arc::new(base_matrix.clone());
+    let gen_rand = Arc::new(gen_rand);
+
+    let (_, two_opt_perm) = two_opt(base_matrix, true);
+    population.push(two_opt_perm);
+
+    // using other metaheuristics, two opt and neighbours
+    // at least half of them will be still randomized
+    let mut threads = Vec::with_capacity(num_of_threads);
+    let (tx, rx) = mpsc::channel();
+
+    for t in 0..num_of_threads {
+        let matrix_clone = Arc::clone(&matrix);
+        let gen_rand_clone = Arc::clone(&gen_rand);
+        let tx_t = tx.clone();
+
+        threads.push(thread::spawn(move || {
+            let mut meta_done = 1;
+
+            if !*gen_rand_clone {
+                let k = std::cmp::min(gen_size / 2, n);
+                for i in (0..k).skip(t).step_by(num_of_threads) {
+                    let (_, neigh_vec) = alg::nearest_neighbor_count(&matrix_clone, i);
+                    tx_t.send(neigh_vec).unwrap();
+                }
+                meta_done = k + 1;
+            }
+
+            let mut rand_thread = rand::thread_rng();
+
+            for _ in (meta_done..gen_size).skip(t).step_by(num_of_threads) {
+                let mut new_vec: Vec<usize> = (0..n).collect();
+                new_vec.shuffle(&mut rand_thread);
+                tx_t.send(new_vec).unwrap();
+            }
+        }));
+    }
+
+    for _ in 1..gen_size {
+        let new_indiviual = rx.recv().unwrap();
+        population.push(new_indiviual);
+    }
+
+    // TODO: index out of bounds
+
+    threads.into_iter().for_each(|thread| {
+        thread
+            .join()
+            .expect("The thread creating or execution failed!")
+    });
+
+    let mut best_value = std::u64::MAX;
+    let mut best_perm = Vec::new();
+
+    while start.elapsed().as_secs_f64() < max_time {
+        // EVALUATION
+        //println!("EVALUATION");
+        // TODO: tutaj potrzebuje population jako arc
+
+        let mut ppbs = Vec::with_capacity(gen_size);
+        let mut new_best_idx = std::usize::MAX;
+
+        let mut threads = Vec::with_capacity(num_of_threads);
+        let (tx, rx) = mpsc::channel();
+        let population_rw = Arc::new(RwLock::new(population));
+
+        for t in 0..num_of_threads {
+            let matrix_clone = Arc::clone(&matrix);
+            let tx_t = tx.clone();
+            let population_clone = Arc::clone(&population_rw);
+
+            threads.push(thread::spawn(move || {
+                let population_r = population_clone.read().unwrap();
+
+                for (i, perm) in population_r
+                    .iter()
+                    .enumerate()
+                    .skip(t)
+                    .step_by(num_of_threads)
+                {
+                    // can be also used in tournament but mainly used in roullete
+                    let new_value = objective_function(perm, &matrix_clone);
+                    tx_t.send((((1.0 / new_value as f64), i), new_value))
+                        .unwrap();
+                }
+            }));
+        }
+
+        for _ in 0..gen_size {
+            let (pair, new_value) = rx.recv().unwrap();
+            if best_value > new_value {
+                best_value = new_value;
+                new_best_idx = pair.1;
+            }
+            ppbs.push(pair);
+        }
+
+        threads.into_iter().for_each(|thread| {
+            thread
+                .join()
+                .expect("The thread creating or execution failed!")
+        });
+
+        // CHECK IF THERE IS STAGNATION, THEN INSERT A RANDOM INDIVIDUAL AT RANDOM IDX, ELSE CHANGE BEST PERM
+        if new_best_idx == std::usize::MAX {
+            let mut rand_thread = rand::thread_rng();
+            let mut new_vec: Vec<usize> = (0..n).collect();
+            new_vec.shuffle(&mut rand_thread);
+            let rand_idx = rand_thread.gen_range(0..gen_size);
+            let mut population_w = population_rw.write().unwrap();
+            population_w[rand_idx] = new_vec;
+        } else {
+            let population_r = population_rw.read().unwrap();
+            best_perm = population_r[new_best_idx].clone(); // best value already changed in the loop
+        }
+
+        // START CREATING NEW GENERATION
+        let mut children = Vec::with_capacity(gen_size);
+
+        // ELITARISM
+        //println!("ELITARISM");
+        ppbs.sort_by(|(a1, _), (b1, _)| b1.partial_cmp(a1).unwrap());
+        let population_r = population_rw.read().unwrap();
+        for i in 0..elite_num {
+            children.push(population_r[ppbs[i].1].clone());
+        }
+
+        // SELECTION AND CROSSING (IN ORDER NOT TO KEEP A VECTOR OF PARENTS)
+        //println!("SELECTION");
+        let num_of_parents = (gen_size - elite_num) + ((gen_size - elite_num) % 2); // can be one extra
+
+        // use roulette
+        // TODO: tutaj watki, trzeba pbbs i population jako odwolan
+        let mut threads = Vec::with_capacity(num_of_threads);
+        let (tx, rx) = mpsc::channel();
+        let ppbs_arc = Arc::new(ppbs);
+
+        for t in 0..num_of_threads {
+            let tx_t = tx.clone();
+            let population_clone = Arc::clone(&population_rw);
+            let ppbs_clone = Arc::clone(&ppbs_arc);
+
+            threads.push(thread::spawn(move || {
+                let population_r = population_clone.read().unwrap();
+
+                if size_of_tournament == 0 {
+                    let mut rand_thread = rand::thread_rng();
+                    let ppbs_sum: f64 = ppbs_clone.iter().map(|(a, _)| a).sum();
+                    for _ in (t..num_of_parents / 2).step_by(num_of_threads) {
+                        let rand_parent1 = rand_thread.gen_range(0.0..ppbs_sum);
+                        let mut index1 = 0;
+                        let mut ppbs_subsum = ppbs_clone[0].0;
+                        while ppbs_subsum < rand_parent1 {
+                            index1 += 1;
+                            ppbs_subsum += ppbs_clone[index1].0;
+                        }
+                        let mut index2 = index1;
+                        while index1 == index2 {
+                            let rand_parent2 = rand_thread.gen_range(0.0..ppbs_sum);
+                            index2 = 0;
+                            let mut ppbs_subsum = ppbs_clone[0].0;
+                            while ppbs_subsum < rand_parent2 {
+                                index2 += 1;
+                                ppbs_subsum += ppbs_clone[index2].0;
+                            }
+                        }
+                        let (child1, child2) =
+                            crossing(&population_r[index1], &population_r[index2], cross_op);
+                        tx_t.send((child1, child2)).unwrap();
+                    }
+                } else {
+                    for _ in (t..num_of_parents / 2).step_by(num_of_threads) {
+                        let mut rand_thread = rand::thread_rng();
+                        let mut best_parent1 = 0;
+                        let mut best_parent2 = 0;
+                        let mut best_value1 = 0.0; // because we are considering 1/x
+                        let mut best_value2 = 0.0; // two best in tournament are parents
+                        for _ in 0..size_of_tournament {
+                            let rand_parent = rand_thread.gen_range(0..gen_size);
+                            if ppbs_clone[rand_parent].0 > best_value1 {
+                                best_value2 = best_value1;
+                                best_parent2 = best_parent1;
+                                best_value1 = ppbs_clone[rand_parent].0;
+                                best_parent1 = rand_parent;
+                            } else if ppbs_clone[rand_parent].0 > best_value2 {
+                                best_value2 = ppbs_clone[rand_parent].0;
+                                best_parent2 = rand_parent;
+                            }
+                        }
+
+                        let (child1, child2) = crossing(
+                            &population_r[best_parent1],
+                            &population_r[best_parent2],
+                            cross_op,
+                        );
+                        tx_t.send((child1, child2)).unwrap();
+                    }
+                }
+            }));
+        }
+
+        for _ in 0..num_of_parents / 2 {
+            let (child1, child2) = rx.recv().unwrap();
+            children.push(child1);
+            children.push(child2);
+        }
+
+        threads.into_iter().for_each(|thread| {
+            thread
+                .join()
+                .expect("The thread creating or execution failed!")
+        });
+
+        // MUTATION
+        //println!("MUTATION");
+        // chyba da rade bez watkow, za duzo z komunikacja problemow,
+        // trzeba by cale przerobione vec przesylac, a rand jest tani
+        population = children[0..gen_size].to_vec(); // CUTTING OFF LAST CHILD
+        let mut rand_thread = rand::thread_rng();
+
+        for individual in &mut population {
+            let do_mutate = rand_thread.gen_range(0.0..1.0);
+            if do_mutate < mut_chance {
+                let i = rand_thread.gen_range(0..n);
+                let j = rand_thread.gen_range(1..n);
+                let j = (i + j) % n;
+                if swap_change {
+                    individual.swap(i, j);
+                } else {
+                    reverse(individual, i, j);
+                }
+            }
+        }
+    }
+
+    //println!("AFTER LOOP");
+
+    let mut best_perm_idx = 0;
+
+    for (i, perm) in population.iter().enumerate() {
+        let new_value = objective_function(perm, base_matrix);
+        if new_value < best_value {
+            best_perm_idx = i;
+            best_value = new_value;
+        }
+    }
+
+    if best_perm_idx != std::usize::MAX {
+        best_perm = population[best_perm_idx].clone(); // value changed in loop
     }
 
     Ok((best_value, best_perm))

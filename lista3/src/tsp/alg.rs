@@ -92,12 +92,9 @@ pub fn nearest_neighbor_count(matrix: &Matrix, first_vertex: usize) -> (u64, Vec
 pub fn reverse(perm: &mut [usize], x: usize, y: usize) {
     let mut i = x;
     let mut j = y;
-    let mut temp: usize;
 
     while i < j {
-        temp = perm[i];
-        perm[i] = perm[j];
-        perm[j] = temp;
+        perm.swap(i, j);
         i += 1;
         j -= 1;
     }
