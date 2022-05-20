@@ -17,7 +17,8 @@ fn tsp_pop(_py: Python, m: &PyModule) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(create_tsp, m)?)?;
     m.add_function(wrap_pyfunction!(population_alg_no_threads_no_isles, m)?)?;
     m.add_function(wrap_pyfunction!(population_alg_no_threads_isles, m)?)?;
-    m.add_function(wrap_pyfunction!(population_alg_threads_no_isles, m)?)?;
+    m.add_function(wrap_pyfunction!(population_alg_threads_no_isles, m)?)?;    m.add_function(wrap_pyfunction!(population_alg_threads_no_isles, m)?)?;
+    m.add_function(wrap_pyfunction!(population_alg_threads_isles, m)?)?;
     m.add_class::<Matrix>()?;
     Ok(())
 }
