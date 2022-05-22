@@ -338,8 +338,8 @@ fn population_alg_no_threads_no_isles(
 fn population_alg_no_threads_isles(
     matrix: &Matrix,           // matrix representing the graph
     gen_rand: bool,            // if false, use other metaheuristics
-    isle_size: usize,          // size of one isle
-    elite_num: usize,          // how many people are in elite (in the whole generation)
+    mut isle_size: usize,          // size of one isle
+    mut elite_num: usize,          // how many people are in elite (in the whole generation)
     cross_op: usize,           // 0 - HX, 1 - OX, 2 - PMX,
     swap_change: bool,         // swap or inverse in a mutation,
     size_of_tournament: usize, // IMPORTANT: if set to 0, then use roulette rule
@@ -350,6 +350,11 @@ fn population_alg_no_threads_isles(
 ) -> PyResult<(u64, Vec<usize>)> {
     // swap_change - true if swap, false if invert, no other options
     // if tabu_size == 0, then tabu_size = n
+    isle_size = isle_size / isles_num as usize;
+    elite_num = elite_num / isles_num as usize;
+    // println!("{}", elite_num);
+    // println!("{}", isle_size);
+
     let start = Instant::now();
 
     // INITIALIZATION PHASE
@@ -426,7 +431,7 @@ fn population_alg_no_threads_isles(
                     best_value = new_value;
                     new_best_idx = (i, j);
                 }
-                ppbs.push(((1.0 / new_value as f64), i));
+                ppbs.push(((1.0 / new_value as f64), j));
             }
             isles_ppbs.push(ppbs);
         }
@@ -454,6 +459,7 @@ fn population_alg_no_threads_isles(
             let mut children = Vec::with_capacity(isle_size);
             isles_ppbs[i].sort_by(|(a1, _), (b1, _)| b1.partial_cmp(a1).unwrap());
             for j in 0..elite_num {
+                // println!("{}, {}, {}, {}, {}, {}", isles.len(), isles_ppbs.len(), isles_ppbs[i].len(), j, i, isles_ppbs[i][j].1);
                 children.push(isles[i][isles_ppbs[i][j].1].clone());
             }
             isles_children.push(children);
@@ -815,8 +821,8 @@ fn population_alg_threads_no_isles(
 fn population_alg_threads_isles(
     base_matrix: &Matrix,      // matrix representing the graph
     gen_rand: bool,            // if false, use other metaheuristics
-    isle_size: usize,          // size of one isle
-    elite_num: usize,          // how many people are in elite (in the whole generation)
+    mut isle_size: usize,          // size of one isle
+    mut elite_num: usize,          // how many people are in elite (in the whole generation)
     cross_op: usize,           // 0 - HX, 1 - OX, 2 - PMX,
     swap_change: bool,         // swap or inverse in a mutation,
     size_of_tournament: usize, // IMPORTANT: if set to 0, then use roulette rule
@@ -828,6 +834,9 @@ fn population_alg_threads_isles(
 ) -> PyResult<(u64, Vec<usize>)> {
     // swap_change - true if swap, false if invert, no other options
     // if tabu_size == 0, then tabu_size = n
+    isle_size = isle_size / isles_num as usize;
+    elite_num = elite_num / isles_num as usize;
+
     let start = Instant::now();
 
     // INITIALIZATION PHASE
@@ -946,7 +955,7 @@ fn population_alg_threads_isles(
                             thread_best_val = new_value;
                             thread_best_ij = (i, j);
                         }
-                        ppbs.push(((1.0 / new_value as f64), i));
+                        ppbs.push(((1.0 / new_value as f64), j));
                     }
                     tx_t.send(ppbs).unwrap();
                 }
