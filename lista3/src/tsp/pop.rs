@@ -338,8 +338,8 @@ fn population_alg_no_threads_no_isles(
 fn population_alg_no_threads_isles(
     matrix: &Matrix,           // matrix representing the graph
     gen_rand: bool,            // if false, use other metaheuristics
-    mut isle_size: usize,          // size of one isle
-    mut elite_num: usize,          // how many people are in elite (in the whole generation)
+    mut isle_size: usize,      // size of one isle
+    mut elite_num: usize,      // how many people are in elite (in the whole generation)
     cross_op: usize,           // 0 - HX, 1 - OX, 2 - PMX,
     swap_change: bool,         // swap or inverse in a mutation,
     size_of_tournament: usize, // IMPORTANT: if set to 0, then use roulette rule
@@ -821,8 +821,8 @@ fn population_alg_threads_no_isles(
 fn population_alg_threads_isles(
     base_matrix: &Matrix,      // matrix representing the graph
     gen_rand: bool,            // if false, use other metaheuristics
-    mut isle_size: usize,          // size of one isle
-    mut elite_num: usize,          // how many people are in elite (in the whole generation)
+    mut isle_size: usize,      // size of one isle
+    mut elite_num: usize,      // how many people are in elite (in the whole generation)
     cross_op: usize,           // 0 - HX, 1 - OX, 2 - PMX,
     swap_change: bool,         // swap or inverse in a mutation,
     size_of_tournament: usize, // IMPORTANT: if set to 0, then use roulette rule
@@ -868,22 +868,16 @@ fn population_alg_threads_isles(
                 }
             } else {
                 // first isle has two_opt, the others have random nearest neighbour
-                if t == 0 {
-                    let mut first_isle = Vec::with_capacity(isle_size);
-                    let (_, two_opt_perm) = two_opt(&matrix_clone, true);
-                    first_isle.push(two_opt_perm);
-                    for _ in 1..isle_size {
-                        let mut new_vec: Vec<usize> = (0..n).collect();
-                        new_vec.shuffle(&mut rand_thread);
-                        first_isle.push(new_vec);
-                    }
-                    tx_t.send(first_isle).unwrap();
-                }
-                for _ in 1..isles_num {
+                for i in (t..isles_num).step_by(num_of_threads) {
                     let mut i_isle = Vec::with_capacity(isle_size);
-                    let i = rand_thread.gen_range(0..n);
-                    let (_, nnc) = alg::nearest_neighbor_count(&matrix_clone, i);
-                    i_isle.push(nnc);
+                    if i == 0 {
+                        let (_, two_opt_perm) = two_opt(&matrix_clone, true);
+                        i_isle.push(two_opt_perm);
+                    } else {
+                        let j = rand_thread.gen_range(0..n);
+                        let (_, nnc) = alg::nearest_neighbor_count(&matrix_clone, j);
+                        i_isle.push(nnc);
+                    }
                     for _ in 1..isle_size {
                         let mut new_vec: Vec<usize> = (0..n).collect();
                         new_vec.shuffle(&mut rand_thread);

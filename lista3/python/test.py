@@ -86,15 +86,17 @@ prd = [prd_def, prd_tabu, prd_gen_rand_true, prd_gen_size_50, prd_gen_size_150, 
 
 
 def test_tsplib(files, pre, post, name, alg_num):
+    num_of_files = len(files)
+    curr_file = 0
     for file in files:
+        curr_file += 1
         m = read_file(pre + file + post)
         min_val = best_values.best_value(file)
         (best_value, best_perm) = two_opt(m, True)
         n = len(best_perm)
 
-
         if alg_num == 1:
-            print(str(datetime.now()) + ":  " + pre + file + post)
+            print(str(datetime.now()) + ":    [" + str(curr_file) + "/" + str(num_of_files) + "]  " + pre + file + post + "   0 / 2")
 
             (val_tabu, _, _) = tabu_search(m, n, True, best_value, best_perm)
             (val_def, _) = population_alg_no_threads_no_isles(m, def_gen_rand, def_gen_size, def_elite_num, def_cross_op, def_swap_change, def_size_of_tournament, def_mut_chance, def_max_time)
@@ -106,7 +108,7 @@ def test_tsplib(files, pre, post, name, alg_num):
             (val_cross_op_0, _) = population_alg_no_threads_no_isles(m, def_gen_rand, def_gen_size, def_elite_num, 0, def_swap_change, def_size_of_tournament, def_mut_chance, def_max_time)
             (val_cross_op_2, _) = population_alg_no_threads_no_isles(m, def_gen_rand, def_gen_size, def_elite_num, 2, def_swap_change, def_size_of_tournament, def_mut_chance, def_max_time)
         
-            print(str(datetime.now()) + ":  polowa")
+            print(str(datetime.now()) + ":    [" + str(curr_file) + "/" + str(num_of_files) + "]  " + pre + file + post + "   1 / 2")
 
             (val_cross_op_3, _) = population_alg_no_threads_no_isles(m, def_gen_rand, def_gen_size, def_elite_num, 3, def_swap_change, def_size_of_tournament, def_mut_chance, def_max_time)
             (val_swap_false, _) = population_alg_no_threads_no_isles(m, def_gen_rand, def_gen_size, def_elite_num, def_cross_op, False, def_size_of_tournament, def_mut_chance, def_max_time)
@@ -117,6 +119,8 @@ def test_tsplib(files, pre, post, name, alg_num):
             (val_max_time_5, _) = population_alg_no_threads_no_isles(m, def_gen_rand, def_gen_size, def_elite_num, def_cross_op, def_swap_change, def_size_of_tournament, def_mut_chance, 5)
             (val_max_time_15, _) = population_alg_no_threads_no_isles(m, def_gen_rand, def_gen_size, def_elite_num, def_cross_op, def_swap_change, def_size_of_tournament, def_mut_chance, 15)
 
+            print(str(datetime.now()) + ":    [" + str(curr_file) + "/" + str(num_of_files) + "]  " + pre + file + post + "   2 / 2")
+
             n_prd_tabu = ((val_tabu - min_val) / min_val) * 100.0
             n_prd_def = ((val_def - min_val) / min_val) * 100.0
             n_prd_gen_rand_true = ((val_gen_rand_true - min_val) / min_val) * 100.0
@@ -135,7 +139,7 @@ def test_tsplib(files, pre, post, name, alg_num):
             n_prd_max_time_5 = ((val_max_time_5 - min_val) / min_val) * 100.0
             n_prd_max_time_15 = ((val_max_time_15 - min_val) / min_val) * 100.0
 
-            f = open("results/1.txt", "a")
+            f = open("results/" + name.lower() + "1.txt", "a")
             f.write(str(n) + ";" + str(n_prd_tabu) + ";" + str(n_prd_def) + ";" + str(n_prd_gen_rand_true) + ";" + str(n_prd_gen_size_50) + ";" + str(n_prd_gen_size_150)
             + ";" + str(n_prd_elite_num_5) + ";" + str(n_prd_elite_num_15) + ";" + str(n_prd_cross_op_0) + ";" + str(n_prd_cross_op_2)
             + ";" + str(n_prd_cross_op_3) + ";" + str(n_prd_swap_false) + ";" + str(n_prd_tour_5) + ";" + str(n_prd_tour_10) + ";" + str(n_prd_mut_chance_5)
@@ -143,7 +147,7 @@ def test_tsplib(files, pre, post, name, alg_num):
             f.close()
 
         if alg_num == 2:
-            print(str(datetime.now()) + ":  " + pre + file + post)
+            print(str(datetime.now()) + ":    [" + str(curr_file) + "/" + str(num_of_files) + "]  " + pre + file + post + "   0 / 3")
 
             (val_tabu, _, _) = tabu_search(m, n, True, best_value, best_perm)
             (val_def, _) = population_alg_no_threads_isles(m, def_gen_rand, def_gen_size, def_elite_num, def_cross_op, def_swap_change, def_size_of_tournament, def_mut_chance, def_max_time, def_isles_num, def_migration_freq)
@@ -153,7 +157,7 @@ def test_tsplib(files, pre, post, name, alg_num):
             (val_elite_num_5, _) = population_alg_no_threads_isles(m, def_gen_rand, def_gen_size, 5, def_cross_op, def_swap_change, def_size_of_tournament, def_mut_chance, def_max_time, def_isles_num, def_migration_freq)
             (val_elite_num_15, _) = population_alg_no_threads_isles(m, def_gen_rand, def_gen_size, 15, def_cross_op, def_swap_change, def_size_of_tournament, def_mut_chance, def_max_time, def_isles_num, def_migration_freq)
             
-            print(str(datetime.now()) + ":  1 / 3")
+            print(str(datetime.now()) + ":    [" + str(curr_file) + "/" + str(num_of_files) + "]  " + pre + file + post + "   1 / 3")
 
             (val_cross_op_0, _) = population_alg_no_threads_isles(m, def_gen_rand, def_gen_size, def_elite_num, 0, def_swap_change, def_size_of_tournament, def_mut_chance, def_max_time, def_isles_num, def_migration_freq)
             (val_cross_op_2, _) = population_alg_no_threads_isles(m, def_gen_rand, def_gen_size, def_elite_num, 2, def_swap_change, def_size_of_tournament, def_mut_chance, def_max_time, def_isles_num, def_migration_freq)
@@ -163,7 +167,7 @@ def test_tsplib(files, pre, post, name, alg_num):
             (val_tour_10, _) = population_alg_no_threads_isles(m, def_gen_rand, def_gen_size, def_elite_num, def_cross_op, def_swap_change, 10, def_mut_chance, def_max_time, def_isles_num, def_migration_freq)
             (val_mut_chance_5, _) = population_alg_no_threads_isles(m, def_gen_rand, def_gen_size, def_elite_num, def_cross_op, def_swap_change, def_size_of_tournament, 0.005, def_max_time, def_isles_num, def_migration_freq)
             
-            print(str(datetime.now()) + ":  2 / 3")
+            print(str(datetime.now()) + ":    [" + str(curr_file) + "/" + str(num_of_files) + "]  " + pre + file + post + "   2 / 3")
             
             (val_mut_chance_10, _) = population_alg_no_threads_isles(m, def_gen_rand, def_gen_size, def_elite_num, def_cross_op, def_swap_change, def_size_of_tournament, 0.010, def_max_time, def_isles_num, def_migration_freq)
             (val_max_time_5, _) = population_alg_no_threads_isles(m, def_gen_rand, def_gen_size, def_elite_num, def_cross_op, def_swap_change, def_size_of_tournament, def_mut_chance, 5, def_isles_num, def_migration_freq)
@@ -173,6 +177,8 @@ def test_tsplib(files, pre, post, name, alg_num):
             (val_migration_freq_5, _) = population_alg_no_threads_isles(m, def_gen_rand, def_gen_size, def_elite_num, def_cross_op, def_swap_change, def_size_of_tournament, def_mut_chance, def_max_time, def_isles_num, 5)
             (val_migration_freq_15, _) = population_alg_no_threads_isles(m, def_gen_rand, def_gen_size, def_elite_num, def_cross_op, def_swap_change, def_size_of_tournament, def_mut_chance, def_max_time, def_isles_num, 15)
 
+            print(str(datetime.now()) + ":    [" + str(curr_file) + "/" + str(num_of_files) + "]  " + pre + file + post + "   3 / 3")
+
             n_prd_tabu = ((val_tabu - min_val) / min_val) * 100.0
             n_prd_def = ((val_def - min_val) / min_val) * 100.0
             n_prd_gen_rand_true = ((val_gen_rand_true - min_val) / min_val) * 100.0
@@ -195,7 +201,7 @@ def test_tsplib(files, pre, post, name, alg_num):
             n_prd_migration_freq_5 = ((val_migration_freq_5 - min_val) / min_val) * 100.0
             n_prd_migration_freq_15 = ((val_migration_freq_15 - min_val) / min_val) * 100.0
 
-            f = open("results/2.txt", "a")
+            f = open("results/" + name.lower() + "2.txt", "a")
             f.write(str(n) + ";" + str(n_prd_tabu) + ";" + str(n_prd_def) + ";" + str(n_prd_gen_rand_true) + ";" + str(n_prd_gen_size_50) + ";" + str(n_prd_gen_size_150)
             + ";" + str(n_prd_elite_num_5) + ";" + str(n_prd_elite_num_15) + ";" + str(n_prd_cross_op_0) + ";" + str(n_prd_cross_op_2)
             + ";" + str(n_prd_cross_op_3) + ";" + str(n_prd_swap_false) + ";" + str(n_prd_tour_5) + ";" + str(n_prd_tour_10) + ";" + str(n_prd_mut_chance_5)
@@ -204,7 +210,7 @@ def test_tsplib(files, pre, post, name, alg_num):
             f.close()
 
         if alg_num == 3:
-            print(str(datetime.now()) + ":  " + pre + file + post)
+            print(str(datetime.now()) + ":    [" + str(curr_file) + "/" + str(num_of_files) + "]  " + pre + file + post + "   0 / 3")
 
             (val_tabu, _, _) = tabu_search(m, n, True, best_value, best_perm)
             (val_def, _) = population_alg_threads_no_isles(m, def_gen_rand, def_gen_size, def_elite_num, def_cross_op, def_swap_change, def_size_of_tournament, def_mut_chance, def_max_time, def_num_of_threads)
@@ -214,7 +220,7 @@ def test_tsplib(files, pre, post, name, alg_num):
             (val_elite_num_5, _) = population_alg_threads_no_isles(m, def_gen_rand, def_gen_size, 5, def_cross_op, def_swap_change, def_size_of_tournament, def_mut_chance, def_max_time, def_num_of_threads)
             (val_elite_num_15, _) = population_alg_threads_no_isles(m, def_gen_rand, def_gen_size, 15, def_cross_op, def_swap_change, def_size_of_tournament, def_mut_chance, def_max_time, def_num_of_threads)
             
-            print(str(datetime.now()) + ":  1 / 3")
+            print(str(datetime.now()) + ":    [" + str(curr_file) + "/" + str(num_of_files) + "]  " + pre + file + post + "   1 / 3")
 
             (val_cross_op_0, _) = population_alg_threads_no_isles(m, def_gen_rand, def_gen_size, def_elite_num, 0, def_swap_change, def_size_of_tournament, def_mut_chance, def_max_time, def_num_of_threads)
             (val_cross_op_2, _) = population_alg_threads_no_isles(m, def_gen_rand, def_gen_size, def_elite_num, 2, def_swap_change, def_size_of_tournament, def_mut_chance, def_max_time, def_num_of_threads)
@@ -224,13 +230,15 @@ def test_tsplib(files, pre, post, name, alg_num):
             (val_tour_10, _) = population_alg_threads_no_isles(m, def_gen_rand, def_gen_size, def_elite_num, def_cross_op, def_swap_change, 10, def_mut_chance, def_max_time, def_num_of_threads)
             (val_mut_chance_5, _) = population_alg_threads_no_isles(m, def_gen_rand, def_gen_size, def_elite_num, def_cross_op, def_swap_change, def_size_of_tournament, 0.005, def_max_time, def_num_of_threads)
             
-            print(str(datetime.now()) + ":  2 / 3")
+            print(str(datetime.now()) + ":    [" + str(curr_file) + "/" + str(num_of_files) + "]  " + pre + file + post + "   2 / 3")
             
             (val_mut_chance_10, _) = population_alg_threads_no_isles(m, def_gen_rand, def_gen_size, def_elite_num, def_cross_op, def_swap_change, def_size_of_tournament, 0.010, def_max_time, def_num_of_threads)
             (val_max_time_5, _) = population_alg_threads_no_isles(m, def_gen_rand, def_gen_size, def_elite_num, def_cross_op, def_swap_change, def_size_of_tournament, def_mut_chance, 5, def_num_of_threads)
             (val_max_time_15, _) = population_alg_threads_no_isles(m, def_gen_rand, def_gen_size, def_elite_num, def_cross_op, def_swap_change, def_size_of_tournament, def_mut_chance, 15, def_num_of_threads)
             (val_num_of_threads_2, _) = population_alg_threads_no_isles(m, def_gen_rand, def_gen_size, def_elite_num, def_cross_op, def_swap_change, def_size_of_tournament, def_mut_chance, def_max_time, 2)
             (val_num_of_threads_8, _) = population_alg_threads_no_isles(m, def_gen_rand, def_gen_size, def_elite_num, def_cross_op, def_swap_change, def_size_of_tournament, def_mut_chance, def_max_time, 8)
+
+            print(str(datetime.now()) + ":    [" + str(curr_file) + "/" + str(num_of_files) + "]  " + pre + file + post + "   3 / 3")
 
             n_prd_tabu = ((val_tabu - min_val) / min_val) * 100.0
             n_prd_def = ((val_def - min_val) / min_val) * 100.0
@@ -252,7 +260,7 @@ def test_tsplib(files, pre, post, name, alg_num):
             n_prd_num_of_threads_2 = ((val_num_of_threads_2 - min_val) / min_val) * 100.0
             n_prd_num_of_threads_8 = ((val_num_of_threads_8 - min_val) / min_val) * 100.0
 
-            f = open("results/3.txt", "a")
+            f = open("results/" + name.lower() + "3.txt", "a")
             f.write(str(n) + ";" + str(n_prd_tabu) + ";" + str(n_prd_def) + ";" + str(n_prd_gen_rand_true) + ";" + str(n_prd_gen_size_50) + ";" + str(n_prd_gen_size_150)
             + ";" + str(n_prd_elite_num_5) + ";" + str(n_prd_elite_num_15) + ";" + str(n_prd_cross_op_0) + ";" + str(n_prd_cross_op_2)
             + ";" + str(n_prd_cross_op_3) + ";" + str(n_prd_swap_false) + ";" + str(n_prd_tour_5) + ";" + str(n_prd_tour_10) + ";" + str(n_prd_mut_chance_5)
@@ -260,7 +268,7 @@ def test_tsplib(files, pre, post, name, alg_num):
             f.close()
 
         if alg_num == 4:
-            print(str(datetime.now()) + ":  " + pre + file + post)
+            print(str(datetime.now()) + ":    [" + str(curr_file) + "/" + str(num_of_files) + "]  " + pre + file + post + "   0 / 3")
 
             (val_tabu, _, _) = tabu_search(m, n, True, best_value, best_perm)
             (val_def, _) = population_alg_threads_isles(m, def_gen_rand, def_gen_size, def_elite_num, def_cross_op, def_swap_change, def_size_of_tournament, def_mut_chance, def_max_time, def_isles_num, def_migration_freq, def_num_of_threads)
@@ -270,7 +278,7 @@ def test_tsplib(files, pre, post, name, alg_num):
             (val_elite_num_5, _) = population_alg_threads_isles(m, def_gen_rand, def_gen_size, 5, def_cross_op, def_swap_change, def_size_of_tournament, def_mut_chance, def_max_time, def_isles_num, def_migration_freq, def_num_of_threads)
             (val_elite_num_15, _) = population_alg_threads_isles(m, def_gen_rand, def_gen_size, 15, def_cross_op, def_swap_change, def_size_of_tournament, def_mut_chance, def_max_time, def_isles_num, def_migration_freq, def_num_of_threads)
             
-            print(str(datetime.now()) + ":  1 / 3")
+            print(str(datetime.now()) + ":    [" + str(curr_file) + "/" + str(num_of_files) + "]  " + pre + file + post + "   1 / 3")
 
             (val_cross_op_0, _) = population_alg_threads_isles(m, def_gen_rand, def_gen_size, def_elite_num, 0, def_swap_change, def_size_of_tournament, def_mut_chance, def_max_time, def_isles_num, def_migration_freq, def_num_of_threads)
             (val_cross_op_2, _) = population_alg_threads_isles(m, def_gen_rand, def_gen_size, def_elite_num, 2, def_swap_change, def_size_of_tournament, def_mut_chance, def_max_time, def_isles_num, def_migration_freq, def_num_of_threads)
@@ -278,12 +286,12 @@ def test_tsplib(files, pre, post, name, alg_num):
             (val_swap_false, _) = population_alg_threads_isles(m, def_gen_rand, def_gen_size, def_elite_num, def_cross_op, False, def_size_of_tournament, def_mut_chance, def_max_time, def_isles_num, def_migration_freq, def_num_of_threads)
             (val_tour_5, _) = population_alg_threads_isles(m, def_gen_rand, def_gen_size, def_elite_num, def_cross_op, def_swap_change, 5, def_mut_chance, def_max_time, def_isles_num, def_migration_freq, def_num_of_threads)
             (val_tour_10, _) = population_alg_threads_isles(m, def_gen_rand, def_gen_size, def_elite_num, def_cross_op, def_swap_change, 10, def_mut_chance, def_max_time, def_isles_num, def_migration_freq, def_num_of_threads)
-            (val_mut_chance_5, _) = population_alg_threads_isles(m, def_gen_rand, def_gen_size, def_elite_num, def_cross_op, def_swap_change, def_size_of_tournament, 0.005, def_max_time, def_isles_num, def_migration_freq, def_num_of_threads)
-            
-            print(str(datetime.now()) + ":  2 / 3")
-            
+            (val_mut_chance_5, _) = population_alg_threads_isles(m, def_gen_rand, def_gen_size, def_elite_num, def_cross_op, def_swap_change, def_size_of_tournament, 0.005, def_max_time, def_isles_num, def_migration_freq, def_num_of_threads)            
             (val_mut_chance_10, _) = population_alg_threads_isles(m, def_gen_rand, def_gen_size, def_elite_num, def_cross_op, def_swap_change, def_size_of_tournament, 0.010, def_max_time, def_isles_num, def_migration_freq, def_num_of_threads)
             (val_max_time_5, _) = population_alg_threads_isles(m, def_gen_rand, def_gen_size, def_elite_num, def_cross_op, def_swap_change, def_size_of_tournament, def_mut_chance, 5, def_isles_num, def_migration_freq, def_num_of_threads)
+
+            print(str(datetime.now()) + ":    [" + str(curr_file) + "/" + str(num_of_files) + "]  " + pre + file + post + "   2 / 3")
+
             (val_max_time_15, _) = population_alg_threads_isles(m, def_gen_rand, def_gen_size, def_elite_num, def_cross_op, def_swap_change, def_size_of_tournament, def_mut_chance, 15, def_isles_num, def_migration_freq, def_num_of_threads)
             (val_isles_num_5, _) = population_alg_threads_isles(m, def_gen_rand, def_gen_size, def_elite_num, def_cross_op, def_swap_change, def_size_of_tournament, def_mut_chance, def_max_time, 5, def_migration_freq, def_num_of_threads)
             (val_isles_num_15, _) = population_alg_threads_isles(m, def_gen_rand, def_gen_size, def_elite_num, def_cross_op, def_swap_change, def_size_of_tournament, def_mut_chance, def_max_time, 15, def_migration_freq, def_num_of_threads)
@@ -291,6 +299,8 @@ def test_tsplib(files, pre, post, name, alg_num):
             (val_migration_freq_15, _) = population_alg_threads_isles(m, def_gen_rand, def_gen_size, def_elite_num, def_cross_op, def_swap_change, def_size_of_tournament, def_mut_chance, def_max_time, def_isles_num, 15, def_num_of_threads)
             (val_num_of_threads_2, _) = population_alg_threads_isles(m, def_gen_rand, def_gen_size, def_elite_num, def_cross_op, def_swap_change, def_size_of_tournament, def_mut_chance, def_max_time, def_isles_num, def_migration_freq, 2)
             (val_num_of_threads_8, _) = population_alg_threads_isles(m, def_gen_rand, def_gen_size, def_elite_num, def_cross_op, def_swap_change, def_size_of_tournament, def_mut_chance, def_max_time, def_isles_num, def_migration_freq, 8)
+
+            print(str(datetime.now()) + ":    [" + str(curr_file) + "/" + str(num_of_files) + "]  " + pre + file + post + "   3 / 3")
 
             n_prd_tabu = ((val_tabu - min_val) / min_val) * 100.0
             n_prd_def = ((val_def - min_val) / min_val) * 100.0
@@ -316,7 +326,7 @@ def test_tsplib(files, pre, post, name, alg_num):
             n_prd_num_of_threads_2 = ((val_num_of_threads_2 - min_val) / min_val) * 100.0
             n_prd_num_of_threads_8 = ((val_num_of_threads_8 - min_val) / min_val) * 100.0
 
-            f = open("results/4.txt", "a")
+            f = open("results/" + name.lower() + "4.txt", "a")
             f.write(str(n) + ";" + str(n_prd_tabu) + ";" + str(n_prd_def) + ";" + str(n_prd_gen_rand_true) + ";" + str(n_prd_gen_size_50) + ";" + str(n_prd_gen_size_150)
             + ";" + str(n_prd_elite_num_5) + ";" + str(n_prd_elite_num_15) + ";" + str(n_prd_cross_op_0) + ";" + str(n_prd_cross_op_2)
             + ";" + str(n_prd_cross_op_3) + ";" + str(n_prd_swap_false) + ";" + str(n_prd_tour_5) + ";" + str(n_prd_tour_10) + ";" + str(n_prd_mut_chance_5)
@@ -326,10 +336,10 @@ def test_tsplib(files, pre, post, name, alg_num):
 
 
 def gen_plots_tsplib(name):
-    plots_1 = csv.reader(open('results/1.txt', 'r'), delimiter=';')
-    plots_2 = csv.reader(open('results/2.txt', 'r'), delimiter=';')
-    plots_3 = csv.reader(open('results/3.txt', 'r'), delimiter=';')
-    plots_4 = csv.reader(open('results/4.txt', 'r'), delimiter=';')
+    plots_1 = csv.reader(open('results/' + name.lower() + '1.txt', 'r'), delimiter=';')
+    plots_2 = csv.reader(open('results/' + name.lower() + '2.txt', 'r'), delimiter=';')
+    plots_3 = csv.reader(open('results/' + name.lower() + '3.txt', 'r'), delimiter=';')
+    plots_4 = csv.reader(open('results/' + name.lower() + '4.txt', 'r'), delimiter=';')
 
     for row in plots_1:
         i = 0
@@ -429,20 +439,20 @@ def gen_plots_tsplib(name):
     plt.clf()
     plt.xlabel('n')
     plt.ylabel('PRD [%]')
-    plt.title(name + ' / Comparison with Tabu')
+    plt.title(name + ' / Comparison with tabu search')
     plt.plot(x, prd_tabu, label='tabu search')
     plt.plot(x, prd_def[0], label='No-Isl No-Thr')
     plt.plot(x, prd_def[1], label='Isl No-Thr')
     plt.plot(x, prd_def[2], label='No-Isl Thr')
     plt.plot(x, prd_def[3], label='Isl Thr')
     plt.legend()
-    plt.savefig('results/plots/tabu_' + name.lower() + '.png')
+    plt.savefig('results/plots/' + name.lower() + '_1_tabu' + '.png')
 
 
     plt.clf()
     plt.xlabel('n')
     plt.ylabel('PRD [%]')
-    plt.title(name + ' / Random start')
+    plt.title(name + ' / Initial permutation')
     plt.plot(x, prd_def[0], label='No-Isl No-Thr 2-OPT')
     plt.plot(x, prd_def[1], label='Isl No-Thr 2-OPT')
     plt.plot(x, prd_def[2], label='No-Isl Thr 2-OPT')
@@ -452,7 +462,7 @@ def gen_plots_tsplib(name):
     plt.plot(x, prd_gen_rand_true[2], label='No-Isl Thr random')
     plt.plot(x, prd_gen_rand_true[3], label='Isl Thr random')
     plt.legend()
-    plt.savefig('results/plots/gen_rand_' + name.lower() + '.png')
+    plt.savefig('results/plots/' + name.lower() + '_2_gen_rand' + '.png')
 
 
     plt.clf()
@@ -472,7 +482,7 @@ def gen_plots_tsplib(name):
     plt.plot(x, prd_gen_size_150[2], label='No-Isl Thr 150')
     plt.plot(x, prd_gen_size_150[3], label='Isl Thr 150')
     plt.legend()
-    plt.savefig('results/plots/gen_size_' + name.lower() + '.png')
+    plt.savefig('results/plots/' + name.lower() + '_3_generation_size' + '.png')
 
 
     plt.clf()
@@ -492,13 +502,13 @@ def gen_plots_tsplib(name):
     plt.plot(x, prd_elite_num_15[2], label='No-Isl Thr 15')
     plt.plot(x, prd_elite_num_15[3], label='Isl Thr 15')
     plt.legend()
-    plt.savefig('results/plots/elite_' + name.lower() + '.png')
+    plt.savefig('results/plots/' + name.lower() + '_4_elite_num' + '.png')
 
 
     plt.clf()
     plt.xlabel('n')
     plt.ylabel('PRD [%]')
-    plt.title(name + ' / Crossing')
+    plt.title(name + ' / Crossing methods')
     plt.plot(x, prd_def[0], label='No-Isl No-Thr 1')
     plt.plot(x, prd_def[1], label='Isl No-Thr 1')
     plt.plot(x, prd_def[2], label='No-Isl Thr 1')
@@ -516,13 +526,13 @@ def gen_plots_tsplib(name):
     plt.plot(x, prd_cross_op_3[2], label='No-Isl Thr 3')
     plt.plot(x, prd_cross_op_3[3], label='Isl Thr 3')
     plt.legend()
-    plt.savefig('results/plots/crossing_' + name.lower() + '.png')
+    plt.savefig('results/plots/' + name.lower() + '_5_crossing' + '.png')
 
 
     plt.clf()
     plt.xlabel('n')
     plt.ylabel('PRD [%]')
-    plt.title(name + ' / Swap')
+    plt.title(name + ' / Swap and inverse in mutation')
     plt.plot(x, prd_def[0], label='No-Isl No-Thr true')
     plt.plot(x, prd_def[1], label='Isl No-Thr true')
     plt.plot(x, prd_def[2], label='No-Isl Thr true')
@@ -532,13 +542,13 @@ def gen_plots_tsplib(name):
     plt.plot(x, prd_swap_false[2], label='No-Isl Thr false')
     plt.plot(x, prd_swap_false[3], label='Isl Thr false')
     plt.legend()
-    plt.savefig('results/plots/swap_' + name.lower() + '.png')
+    plt.savefig('results/plots/' + name.lower() + '_6_swap_inverse' + '.png')
 
 
     plt.clf()
     plt.xlabel('n')
     plt.ylabel('PRD [%]')
-    plt.title(name + ' / Tour')
+    plt.title(name + ' / Size of tournament')
     plt.plot(x, prd_def[0], label='No-Isl No-Thr 0')
     plt.plot(x, prd_def[1], label='Isl No-Thr 0')
     plt.plot(x, prd_def[2], label='No-Isl Thr 0')
@@ -552,13 +562,13 @@ def gen_plots_tsplib(name):
     plt.plot(x, prd_tour_10[2], label='No-Isl Thr 10')
     plt.plot(x, prd_tour_10[3], label='Isl Thr 10')
     plt.legend()
-    plt.savefig('results/plots/tour_' + name.lower() + '.png')
+    plt.savefig('results/plots/' + name.lower() + '_7_tour' + '.png')
 
 
     plt.clf()
     plt.xlabel('n')
     plt.ylabel('PRD [%]')
-    plt.title(name + ' / Mut chance')
+    plt.title(name + ' / Mutation chance')
     plt.plot(x, prd_def[0], label='No-Isl No-Thr 0.001')
     plt.plot(x, prd_def[1], label='Isl No-Thr 0.001')
     plt.plot(x, prd_def[2], label='No-Isl Thr 0.001')
@@ -572,7 +582,7 @@ def gen_plots_tsplib(name):
     plt.plot(x, prd_mut_chance_10[2], label='No-Isl Thr 0.010')
     plt.plot(x, prd_mut_chance_10[3], label='Isl Thr 0.010')
     plt.legend()
-    plt.savefig('results/plots/mut_chance_' + name.lower() + '.png')
+    plt.savefig('results/plots/' + name.lower() + '_8_mut_chance' + '.png')
 
 
     plt.clf()
@@ -592,11 +602,52 @@ def gen_plots_tsplib(name):
     plt.plot(x, prd_max_time_15[2], label='No-Isl Thr 15')
     plt.plot(x, prd_max_time_15[3], label='Isl Thr 15')
     plt.legend()
-    plt.savefig('results/plots/max_time_' + name.lower() + '.png')
+    plt.savefig('results/plots/' + name.lower() + '_9_max_time' + '.png')
 
+
+    plt.clf()
+    plt.xlabel('n')
+    plt.ylabel('PRD [%]')
+    plt.title(name + ' / Number of isles')
+    plt.plot(x, prd_def[1], label='Isl No-Thr 10')
+    plt.plot(x, prd_def[3], label='Isl Thr 10')
+    plt.plot(x, prd_isles_5[1], label='Isl No-Thr 5')
+    plt.plot(x, prd_isles_5[3], label='Isl Thr 5')
+    plt.plot(x, prd_isles_15[1], label='Isl No-Thr 15')
+    plt.plot(x, prd_isles_15[3], label='Isl Thr 15')
+    plt.legend()
+    plt.savefig('results/plots/' + name.lower() + '_10_isles' + '.png')
+
+
+    plt.clf()
+    plt.xlabel('n')
+    plt.ylabel('PRD [%]')
+    plt.title(name + ' / Migration frequency')
+    plt.plot(x, prd_def[1], label='Isl No-Thr 10')
+    plt.plot(x, prd_def[3], label='Isl Thr 10')
+    plt.plot(x, prd_migration_freq_5[1], label='Isl No-Thr 5')
+    plt.plot(x, prd_migration_freq_5[3], label='Isl Thr 5')
+    plt.plot(x, prd_migration_freq_15[1], label='Isl No-Thr 15')
+    plt.plot(x, prd_migration_freq_15[3], label='Isl Thr 15')
+    plt.legend()
+    plt.savefig('results/plots/' + name.lower() + '_11_migration_freq' + '.png')
+
+
+    plt.clf()
+    plt.xlabel('n')
+    plt.ylabel('PRD [%]')
+    plt.title(name + ' / Number of threads')
+    plt.plot(x, prd_def[1], label='Isl No-Thr 4')
+    plt.plot(x, prd_def[3], label='Isl Thr 4')
+    plt.plot(x, prd_num_of_threads_2[2], label='No-Isl Thr 2')
+    plt.plot(x, prd_num_of_threads_2[3], label='Isl Thr 2')
+    plt.plot(x, prd_num_of_threads_8[2], label='No-Isl Thr 8')
+    plt.plot(x, prd_num_of_threads_8[3], label='Isl Thr 8')
+    plt.legend()
+    plt.savefig('results/plots/' + name.lower() + '_12_num_of_threads' + '.png')
 
     
-# test_tsplib(files_euclid, pre_euclid, post_euclid, name_euclid, 1)
-# test_tsplib(files_asym, pre_asym, post_asym, name_asym, 1)
+test_tsplib(files_euclid, pre_euclid, post_euclid, name_euclid, 4)
+test_tsplib(files_asym, pre_asym, post_asym, name_asym, 4)
 
-gen_plots_tsplib(name_euclid)
+# gen_plots_tsplib(name_euclid)
