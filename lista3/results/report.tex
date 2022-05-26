@@ -44,14 +44,57 @@
 \maketitle
 
 \section{Rodzaje algorytmu}
-Rodzaje algorytmu - do zrobienia
+Algorytm genetyczny można podzielić ze względu na dwie znaczące modyfikacje:
+\begin{itemize}
+\item algorytm może działać na jednej populacji lub na wielu populacjach żyjących na osobnych wyspach
+\item algorytm może działać całkowicie sekwencyjnie lub wykonywać część obliczeń równolegle
+\end{itemize}
 
 \section{Parametry algorytmów}
-Parametry algorytmów - do zrobienia
+Dla algorytmu sekwencyjnego z jedną populacją podajemy następujące parametry:
+\begin{itemize}
+\item $matrix$: macierz przechowująca odległości między miastami z problemu TSP
+\item $gen\_rand$: wartość logiczna mówiąca, czy pierwsze pokolenie ma być całkowicie losowe czy przybliżone innymi metaheurystykami
+\item $gen\_size$: liczność populacji na każdym etapie algorytmu
+\item $elite\_num$: liczność elity, czyli najlepszych rozwiązań, które przeżywają i przechodzą do następnego pokolenia
+\item $cross\_op$: wartość enumeratywna mówiąca o tym, jaki typ krzyżowania zostanie użyty w algorytmie. Możliwe wartości:
+\begin{itemize}
+\item 0 - HALF CROSSOVER: dziecko w każdym kroku generowania przyjmuje kolejne od jednego z rodziców miasto z prawdopodobieństwem 1/2, bierzemy najwcześniejsze miasto z rodzica, które nie występuje w dziecku
+\item 1 - ORDER CROSSOVER: pół dziecka to podciąg rodzica, drugie pół to podciąg drugiego rodzica składający się z nieużytych wcześniej miast i zaczynający od miasta występującego na tym miejscu w pierwszym rodzicu
+\item 2 - CYCLE CROSSOVER: bierzemy miasto z pierwszego rodzica, patrzymy na miasto pod danym indeksem w drugim rodzicu, idziemy do niego w pierwszym rodzicu, powtarzamy aż zamkniemy cykl. Resztę uzupełniamy drugim rodzicem.
+\item 3 - PARTIALLY MAPPED CROSSOVER: na danym podciągu indeksów tworzymy mapę między rodzicami, następnie używamy pociągu z jednego rodzica i zmapowanych wartości z drugiego.
+\end{itemize}
+\item $swap\_change$: wartość logiczna decydująca o tym, czy w trakcie mutacji poruszamy się w sąsiedztwie $swap$ czy $reverse$
+\item $size\_of\_tournament$: rozmiar turnieju przy losowaniu rodziców do tworzenia nowego pokolenia. Wartość ustawiona na 0 sprawia, że zamiast turnieju korzystamy z zasady ruletki, gdzie funkcja dopasowania jest odwrotnością wagi danej permutacji.
+\item $mut\_chance$: prawdopodobieństwo, że dany osobnik zmutuje.
+\item $max\_time$: ograniczenie czasowe, po którym algorytm kończy działanie. Wynik zwracany przez algorytm to najlepszy wynik znaleziony przed przekroczeniem limitu czasowego. 
+
+\end{itemize}
+Dla algorytmu wyspowego podajemy także:
+\begin{itemize}
+\item $isles\_num$: liczba wysp 
+\item $migration\_freq$: liczba iteracji, które dzielą od siebie moment wymiany genetycznej między wyspami
+\end{itemize}
+
+W algorytmach urównoleglonych podaje się również parametr $num\_of\_threads$, który mówi o liczbie wątków.
 
 \section{Teoretyczna złożoność}
-Teoretyczna złożoność - do zrobienia
+Rozważmy złożoności poszczególnych etapów w algorytmie sekwencyjnym bez wysp. Niech $n$ to liczba miast, a $k$ to liczność pokolenia:
+\begin{itemize}
+\item \textbf{Wyznaczanie populacji początkowej}: w języku Rust losowanie permutacji ma złożoność $O(1)$, zatem losowa generacja osobników ma złożoność $O(k)$. Dla przybliżeń przez inne metaheurystyki co najwyżej $\frac{k}{4}$ jest przybliżone, w naszym przypadku dajemy jeden raz $2-OPT$ ze złożonością $O(n^3)$ i pozostałe to $nearest-neighbours$ od losowego miasta ze złożonością $O(n^2)$.
+\item \textbf{Ewaluacja}: Obliczanie wartości danej permutacji ma złożoność $O(n)$, robimy to $k$ razy, zatem cały krok ma $O(kn)$.
+\item \textbf{Selekcja}: Wybieramy $k$ rodziców. Przy ruletce wybór rodzica ma złożoność $O(1)$, przy turnieju $O(l)$, gdzie $l$ to rozmiar turnieju. Zatem $O(k)$ dla ruletki i $O(kl)$ dla turnieju.
+\item \textbf{Krzyżowanie}: Każde z krzyżowań odbywa się w czasie liniowym względem długości permutacji, czyli $O(n)$, przy tworzeniu całej permutacji mamy $O(kn)$.
+\item \textbf{Mutacja}: mutacja typu $swap$ ma złożoność $\Theta(1)$, a typu $reverse$ $\Theta(n)$. Mutacji wykonujemy $\Theta(pn)$, gdzie $p$ to prawdopodobieństwo mutacji. Zatem ta faza ma złożoność $\Theta(pn)$ lub $\Theta(pn^2)$. W worst case możemu wylosować wszystkie, więc odpowiednio złożoności są $O(n)$ i $O(n^2)$.
+\end{itemize}
+Ponadto w algorytmie wyspowym regularnie w niektórych iteracjach wymieniana jest informacja genetyczna ze złożonością $O(k^2)$ (każda wyspa wymienia się z każdą jakimś osobnikiem).
 
+Podsumowując, w najgorszym przypadku:
+\begin{itemize}
+\item \textbf{Generacja początkowej populacji}: $$O(n^3+kn^2+k)=O((n+k)n^2)$$
+\item \textbf{Właściwa iteracja:}
+$$O(kn)+O(kl)+O(kn)+O(n^2)+O(k^2)=O(k(n+l+k)+n^2)$$
+\end{itemize}
 \section{Wykonane eksperymenty}
 
 Strojenie algorytmu zostało wykonane na podstawie danych z TSPLIB. Wybrane zostały parametry, dla których algorytm najlepiej zachowywał się podczas testowania. Jeśli jeden z dwóch parametrów miał np. lepsze wyniki od drugiego dla jednych danych (np. dla mniejszych wielkości macierzy), a gorsze dla innych, wybierany był jeden z tych parametrów po przemyśleniu.
