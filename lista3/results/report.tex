@@ -560,7 +560,26 @@ Po strojeniu zostały przeprowadzone eksperymenty porównujące algorytm w wersj
 
 \section{Obserwacje i wnioski}
 \begin{itemize}
-\item Obserwacje i wnioski - do zrobienia
+\item W przypadku praktycznie wszystkich testowanych macierzy, algorytm genetyczny działał tak samo dobrze lub gorzej od zaimplementowanego na liście 2 przeszukiwania tabu. Pozwala to stwierdzić, że dla problemu komiwojażera najbardziej opłaca się użyć tabu search (jeśli chcemy otrzymać najlepsze wyniki) lub 2-opta (jeśli zależy nam na czasie, ale wyniki wciąż mają być stosunkowo dobre).
+
+\item Dla każdego typu macierzy powtórzył się jeden wynik - jeśli pierwsze pokolenie było całkowicie losowe, to dawało to bardzo słabe rezultaty, nawet nie zbliżające się do optymalnych. Natomiast przy przybliżeniu pierwszego pokolenia innymi metaheurystykami(2-OPT) wyniki stawały się bardzo dobre.
+
+\item W przypadku macierzy symetrycznych, podobnie jak w eksperymentach z poprzedniej listy, nie ma różnicy w wynikach w zależności od wybranych parametrów. Dla tych macierzy optymalnym rozwiązaniem jest 2-opt, ponieważ algorytmy startujące z przybliżenia początkowego generowanego przez 2-opt nie poprawiają wyników.
+
+\item Dla macierzy euklidesowych różnice między poszczególnymi algorytmami i wybranymi parametrami istnieją, ale są minimalne.
+
+\item Macierze asymetryczne dostarczają znacznie bardziej różnorodnych wyników:
+\subitem Najlepszy okazał się algorytm z wątkami i wyspami, chociaż dla mniejszych macierzy generowanych przez nas najlepszy okazał się algorytm bez wątków oraz wysp, pokonując nawet tabu search.
+\subitem Najlepszy rozmiar macierzy dla danych z TSPLIB to 100, osiągając podobny wynik do 50, natomiast największy testowany rozmiar - 150 - miał znacznie gorsze wyniki. Dla danych generowanych wyniki były bardziej do siebie zbliżone i ciężko jednoznacznie określić zwycięzcę.
+\subitem Algorytm dawał najlepsze wyniki dla większych wielkości elity (10 i 15 na 100-osobowe pokolenie), niż mniejszej (5).
+\subitem Średnio najlepszą metodą krzyżowania okazała się Order Crossover.
+\subitem Metoda swap stosowana przy mutacji dawała znacznie lepsze rezultaty niż inverse (często nawet dwukrotnie lepsze).
+\subitem W danych z TSPLIB zdecydowanie najlepiej wypadł turniej z wykorzystaniem zasady ruletki, niż klasyczny turniej z ustalonymi wielkościami. Co ciekawe, na danych generowanych przez nas wyniki ruletki były dla wielu n najgorsze.
+\subitem Zwiększanie szansy mutacji do pewnego stopnia poprawiało otrzymywane wyniki - najwyższa szansa mutacji (0.1) dawała najlepsze wyniki.
+\subitem Ograniczenie czasowe nie wpływało aż tak na wyniki - o ile najkrótszy czas (5 sekund) dawał najgorsze rezultaty, to pomiędzy 10 i 15 sekund nie było aż takiej różnicy, a wyniki były nawet często lepsze dla średniego czasu (10s).
+\subitem Liczba wysp dawała zawsze zbliżone wyniki dla 5, 10 i 15 wysp, często różnie dla róznych wielkości macierzy, zatem ciężko wybrać najlepszą wartość.
+\subitem Optymalną częstotliwością migracji na podstawie wykresów można nazwać 10.
+\subitem Optymalną liczbą wątków są 4, ponieważ w przypadku większej liczby wątków obliczenia i tak nie wykonają się równolegle, a komunikacja między wątkami kosztuje.
 \end{itemize}
 
 \end{document}
